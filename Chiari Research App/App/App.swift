@@ -6,14 +6,18 @@
 //
 
 import SwiftUI
+import FirebaseCore
 
 @main
 struct Chiari_Research_AppApp: App {
+    
+    init() {
+        FirebaseApp.configure()
+    }
+    
     var body: some Scene {
         WindowGroup {
             ContentView()
-            // get litty
-            
         }
     }
 }

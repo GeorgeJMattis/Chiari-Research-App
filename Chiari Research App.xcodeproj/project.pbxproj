@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		05783ACE2F93F74400BBC01F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 05783ACD2F93F74400BBC01F /* FirebaseAuth */; };
+		05783AD02F93F74400BBC01F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 05783ACF2F93F74400BBC01F /* FirebaseFirestore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		05783A8D2F9302C700BBC01F /* Chiari Research App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chiari Research App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +28,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				05783ACE2F93F74400BBC01F /* FirebaseAuth in Frameworks */,
+				05783AD02F93F74400BBC01F /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +72,8 @@
 			);
 			name = "Chiari Research App";
 			packageProductDependencies = (
+				05783ACD2F93F74400BBC01F /* FirebaseAuth */,
+				05783ACF2F93F74400BBC01F /* FirebaseFirestore */,
 			);
 			productName = "Chiari Research App";
 			productReference = 05783A8D2F9302C700BBC01F /* Chiari Research App.app */;
@@ -94,6 +103,9 @@
 			);
 			mainGroup = 05783A842F9302C700BBC01F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				05783ACC2F93F74400BBC01F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 05783A8E2F9302C700BBC01F /* Products */;
 			projectDirPath = "";
@@ -328,6 +340,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		05783ACC2F93F74400BBC01F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.12.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		05783ACD2F93F74400BBC01F /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05783ACC2F93F74400BBC01F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		05783ACF2F93F74400BBC01F /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 05783ACC2F93F74400BBC01F /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 05783A852F9302C700BBC01F /* Project object */;
 }
