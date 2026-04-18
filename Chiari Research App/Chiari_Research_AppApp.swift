@@ -12,6 +12,8 @@ struct Chiari_Research_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+            // get litty
+            
         }
     }
 }
