@@ -14,13 +14,13 @@ import Foundation
 class LocalPressureData {
     var pressure: Double
     var timeStamp: Date
-    var relativeAltitudeChange: Double
+    var altitude: Double
     var flightsClimbed: Int
     var stepsTaken: Int
-    init(pressure: Double, timeStamp: Date, relativeAltitudeChange: Double, flightsClimbed: Int, stepsTaken: Int) {
+    init(pressure: Double, timeStamp: Date, altitude: Double, flightsClimbed: Int, stepsTaken: Int) {
         self.pressure = pressure //kPa
         self.timeStamp = timeStamp
-        self.relativeAltitudeChange = relativeAltitudeChange //meters
+        self.altitude = altitude //meters
         self.flightsClimbed = flightsClimbed
         self.stepsTaken = stepsTaken
     }

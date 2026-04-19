@@ -3,8 +3,14 @@ import CoreMotion
 
 class CMAltimeterService: PressureSampling {
     private let altimeter = CMAltimeter()
+    private var sessionData: [RealTimeData] = []
+
+    private let realTimeData: RealTimeData
+    private let storageService: StorageService
+    private let networkService: NetworkService
     
     func startSampling() async {
+        sessionData.removeAll()
         guard CMAltimeter.isRelativeAltitudeAvailable() else {
             print("Altimeter not available on this device.")
             return
@@ -16,19 +22,17 @@ class CMAltimeterService: PressureSampling {
                 return
             }
             
-            let pressure = data.pressure.doubleValue // Pressure in kPa
-            let relativeAltitudeChange = data.relativeAltitude.doubleValue // Relative altitude change in meters
-            let timeStamp = Date()
-            
-            // TODO: Store or publish this data to your app
-            print("Pressure: \(pressure) kPa, Altitude: \(relativeAltitudeChange)m")
+            let sample = RealTimeData(pressure: data.pressure.doubleValue, timestamp: Date(), relativeAltitudeChange: data.relativeAltitude.doubleValue)
+            sessionData.append(sample)
         }
     }
     
     func stopSampling() async {
         altimeter.stopRelativeAltitudeUpdates()
     }
-    
+    func getReadings() -> [RealTimeData] {
+        return sessionData
+    }
     func singleRead() async {
         guard CMAltimeter.isRelativeAltitudeAvailable() else {
             print("Altimeter not available on this device.")

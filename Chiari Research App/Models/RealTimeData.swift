@@ -8,5 +8,8 @@
 import Foundation
 
 struct RealTimeData: Codable {
-    
+    let pressure: Double
+    let timestamp: Date
+    let relativeAltitudeChange: Double
+
 }
