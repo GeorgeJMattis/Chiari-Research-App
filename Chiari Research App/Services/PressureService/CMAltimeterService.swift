@@ -2,7 +2,7 @@ import Foundation
 import CoreMotion
 
 class CMAltimeterService: PressureSampling {
-    private let motionManager = CMMotionManager()
+    private let altimeter = CMAltimeter()
     
     func startSampling() async {
         guard CMAltimeter.isRelativeAltitudeAvailable() else {
@@ -10,8 +10,7 @@ class CMAltimeterService: PressureSampling {
             return
         }
         
-        motionManager.relativeAltitudeUpdateInterval = 1.0
-        motionManager.startRelativeAltitudeUpdates(to: .main) { [weak self] data, error in
+        altimeter.startRelativeAltitudeUpdates(to: .main) { [weak self] data, error in
             guard let data = data, error == nil else {
                 print("Error: \(error?.localizedDescription ?? "Unknown error")")
                 return
@@ -27,7 +26,7 @@ class CMAltimeterService: PressureSampling {
     }
     
     func stopSampling() async {
-        motionManager.stopRelativeAltitudeUpdates()
+        altimeter.stopRelativeAltitudeUpdates()
     }
     
     func singleRead() async {
