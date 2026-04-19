@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct RealTimeData: Codeable {
+struct RealTimeData: Codable {
     
 }
