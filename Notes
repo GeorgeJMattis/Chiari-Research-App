@@ -1,0 +1,58 @@
+Ideas:
+
+Widget for instant data collectiion!!!
+
+Sensor Kit!
+
+
+
+
+User Flow:
+Background:
+Hour 1: Sample pressure → Save to DB
+Hour 2: Sample pressure → Save to DB
+Hour 3: Sample pressure → Save to DB
+    ↓
+User gets notification "Fill survey!"
+    ↓
+Query DB: Get all LocalPressureData since last survey
+    ↓
+Attach to SurveySession
+    ↓
+Submit survey + all hourly data to server
+    ↓
+Clear/delete those LocalPressureData samples
+    ↓
+Start collecting again hourly
+
+RealTimeData:
+User taps "Start Survey"
+    ↓
+Start 1-sec sampling → RealTimeData array
+    ↓
+User fills form, taps "Submit"
+    ↓
+Attach RealTimeData + LocalPressureData to SurveySession
+    ↓
+Submit to server
+    ↓
+Clear survey data
+WidgetSnapshot:
+User presses widget
+    ↓
+Sample for 30 sec
+    ↓
+Save WidgetSnapshot to DB independently
+    ↓
+Can be submitted separately or ignored
+
+
+
+IRB approval from Northeastern's ethics board
+Apple Developer account ($99/yr — now you actually need it)
+Research proposal submitted to Apple
+Two stages of entitlement:
+
+Development entitlement → for building and testing
+Distribution entitlement → for TestFlight/App Store
+
