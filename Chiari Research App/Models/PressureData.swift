@@ -11,13 +11,13 @@ import Foundation
  This data is stored locally and will be sent to firebase on survey completion.
  */
 @Model
-class LocalPressureData {
+class LocalPressureData: Codable {
     var pressure: Double
     var timeStamp: Date
-    var altitude: Double
-    var flightsClimbed: Int
-    var stepsTaken: Int
-    init(pressure: Double, timeStamp: Date, altitude: Double, flightsClimbed: Int, stepsTaken: Int) {
+    var altitude: Double?
+    var flightsClimbed: Int?
+    var stepsTaken: Int?
+    init(pressure: Double, timeStamp: Date, altitude: Double?, flightsClimbed: Int?, stepsTaken: Int?) {
         self.pressure = pressure //kPa
         self.timeStamp = timeStamp
         self.altitude = altitude //meters

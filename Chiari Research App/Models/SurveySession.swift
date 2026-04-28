@@ -18,5 +18,4 @@ class SurveySession {
     var surveyStartTime: Date
     var surveyEndTime: Date?
     var localPressureData: [LocalPressureData]
-    var realTimeData: [RealTimeData]
 }
