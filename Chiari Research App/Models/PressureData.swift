@@ -11,7 +11,7 @@ import Foundation
  This data is stored locally and will be sent to firebase on survey completion.
  */
 @Model
-class LocalPressureData: Codable {
+class PressureData: Codable {
     var pressure: Double
     var timeStamp: Date
     var altitude: Double?
