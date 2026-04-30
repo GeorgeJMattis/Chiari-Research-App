@@ -5,14 +5,14 @@
 //  Created by George Mattis on 4/17/26.
 //
 
-
+import Foundation
 class StorageService {
     let encoder = JSONEncoder()
     let fileManager = FileManager.default
     let urls = fileManager.urls(for: .documentDirectory, in : .userDomainMask)
     let documentsDirectory = urls[0]
-
-    func savePressureDataToDisk(_ data: PressureData) {
+    
+    func savePressureDataToDisk(_ data: [PressureData]) {
         do {
             let encodedData = try encoder.encode(data)
             data.write(to:)

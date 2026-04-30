@@ -12,7 +12,7 @@ class SensorService {
         #if SENSORKIT_ENABLED
         self.pressureService = SensorKitPressureSampling()
         #else
-        self.pressureService = CMALtimeterService()
+        self.pressureService = CMAltimeterService()
         #endif
     }
 
