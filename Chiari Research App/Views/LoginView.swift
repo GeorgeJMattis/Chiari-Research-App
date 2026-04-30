@@ -11,6 +11,7 @@ struct LoginView: View {
     @ObservedObject var authViewModel: AuthViewModel
     @State private var email = ""
     @State private var password = ""
+    @State private var isSigningUp = false
     
     var body: some View {
         VStack(spacing: 20) {
@@ -18,7 +19,7 @@ struct LoginView: View {
                 Text("Chiari Research")
                     .font(.title)
                     .bold()
-                Text("Beeep Booop")
+                Text("Beta")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -43,14 +44,18 @@ struct LoginView: View {
             
             Button(action: {
                 Task {
-                    await authViewModel.login(email: email, password: password)
+                    if isSigningUp {
+                        await authViewModel.signUp(email: email, password: password)
+                    } else {
+                        await authViewModel.login(email: email, password: password)
+                    }
                 }
             }) {
                 if authViewModel.isLoading {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text("Sign In")
+                    Text(isSigningUp ? "Sign Up" : "Sign In")
                 }
             }
             .frame(maxWidth: .infinity)
@@ -59,6 +64,15 @@ struct LoginView: View {
             .foregroundStyle(.white)
             .clipShape(.rect(cornerRadius: 8))
             .disabled(authViewModel.isLoading)
+            .padding(.bottom, 20)
+            
+            Button(action: {
+                isSigningUp.toggle()
+            }) {
+                Text(isSigningUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up")
+                    .font(.footnote)
+                    .foregroundStyle(.blue)
+            }
             
             Spacer()
             
