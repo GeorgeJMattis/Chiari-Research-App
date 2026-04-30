@@ -14,27 +14,58 @@ class AuthViewModel: ObservableObject {
     @Published var currentUser: String? = nil
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
+
+    private let authService = AuthService()
+
+    init() {
+        if let uid = authService.getCurrentUser() {
+            isLoggedIn = true
+            currentUser = uid
+        }
+    }
+
     
     func login(email: String, password: String) async {
         isLoading = true
         errorMessage = nil
-        
-        // TODO: Integrate with AuthService
-        try? await Task.sleep(nanoseconds: 500_000_000) // Simulate network delay
-        
-        if !email.isEmpty && !password.isEmpty {
+
+        do {
+            let uid = try await authService.login(email: email, password: password)
             isLoggedIn = true
-            currentUser = email
-        } else {
-            errorMessage = "Email and password are required"
+            currentUser = uid
+
+        } catch {
+            errorMessage = error.localizedDescription
         }
-        
+        isLoading = false
+    }
+
+    func signUp(email: String, password: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            let uid = try await authService.signUp(email: email, password: password)
+            isLoggedIn = true
+            currentUser = uid
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+
         isLoading = false
     }
     
     func logout() {
-        isLoggedIn = false
-        currentUser = nil
+        isLoading = true
         errorMessage = nil
+        do { 
+            try authService.logout()
+            isLoggedIn = false
+            currentUser = nil
+            errorMessage = nil
+
+       } catch {
+            errorMessage = error.localizedDescription
+       }
+       isLoading = false
     }
 }
