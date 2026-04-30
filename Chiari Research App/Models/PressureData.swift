@@ -1,27 +1,16 @@
 //
-//  LocalEnvironmentalData.swift
+//  PressureData.swift
 //  Chiari Research App
 //
 //  Created by George Mattis on 4/18/26.
-import SwiftData
+//
+
 import Foundation
 
-
-/**
- This data is stored locally and will be sent to firebase on survey completion.
- */
-@Model
-class PressureData: Codable {
-    var pressure: Double
-    var timeStamp: Date
-    var altitude: Double?
-    var flightsClimbed: Int?
-    var stepsTaken: Int?
-    init(pressure: Double, timeStamp: Date, altitude: Double?, flightsClimbed: Int?, stepsTaken: Int?) {
-        self.pressure = pressure //kPa
-        self.timeStamp = timeStamp
-        self.altitude = altitude //meters
-        self.flightsClimbed = flightsClimbed
-        self.stepsTaken = stepsTaken
-    }
+struct PressureData: Codable {
+    let pressure: Double
+    let timeStamp: Date
+    let altitude: Double?
+    let flightsClimbed: Int?
+    let stepsTaken: Int?
 }

@@ -18,7 +18,7 @@ struct LoginView: View {
                 Text("Chiari Research")
                     .font(.title)
                     .bold()
-                Text("Study Tracker")
+                Text("Beeep Booop")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }

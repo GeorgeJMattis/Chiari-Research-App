@@ -1,11 +1,8 @@
-import foundation
+import Foundation
 
 class SurveySessionManager {
-    func sendToServer(_ survey: SurveySession) async throws{
+    func sendToServer(_ survey: SurveySession) async throws {
         let jsonEncoder = JSONEncoder()
-        let jsonData = try jsonEncoder.encode(survey)
+        _ = try jsonEncoder.encode(survey)
     }
-
-
-
 }

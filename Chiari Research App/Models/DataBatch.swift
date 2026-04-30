@@ -1,3 +1,5 @@
+import Foundation
+
 struct PressureBatch: Codable {
     let batchID: String
     let userID: String

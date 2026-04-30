@@ -6,17 +6,18 @@
 //
 
 import Foundation
+
 class StorageService {
-    let encoder = JSONEncoder()
-    let fileManager = FileManager.default
-    let urls = fileManager.urls(for: .documentDirectory, in : .userDomainMask)
-    let documentsDirectory = urls[0]
-    
+    private let encoder = JSONEncoder()
+    private let fileManager = FileManager.default
+
     func savePressureDataToDisk(_ data: [PressureData]) {
         do {
             let encodedData = try encoder.encode(data)
-            data.write(to:)
-            
+            let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            let fileURL = documentsDirectory.appendingPathComponent("pressure-data.json")
+
+            try encodedData.write(to: fileURL)
         } catch {
             print("Failed to encode pressure data: \(error)")
         }

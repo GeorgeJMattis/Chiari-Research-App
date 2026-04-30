@@ -14,7 +14,7 @@ struct Chiari_Research_AppApp: App {
     @StateObject var surveyViewModel = SurveyViewModel()
     
     init() {
-        FirebaseApp.configure()
+        // FirebaseApp.configure()
     }
     
     var body: some Scene {
