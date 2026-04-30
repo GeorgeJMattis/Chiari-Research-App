@@ -10,6 +10,8 @@ import FirebaseCore
 
 @main
 struct Chiari_Research_AppApp: App {
+    @StateObject var authViewModel = AuthViewModel()
+    @StateObject var surveyViewModel = SurveyViewModel()
     
     init() {
         FirebaseApp.configure()
@@ -17,7 +19,11 @@ struct Chiari_Research_AppApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if authViewModel.isLoggedIn {
+                HomeView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
+            } else {
+                LoginView(authViewModel: authViewModel)
+            }
         }
     }
 }
