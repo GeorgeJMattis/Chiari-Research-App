@@ -48,20 +48,19 @@ class AuthViewModel: ObservableObject {
             let uid = try await authService.signUp(email: email, password: password)
             isLoggedIn = true
             currentUser = uid
+            
+            let userInfo = UserInfo(
+                uid: uid,
+                email: email,
+                name: nil,
+                country: nil,
+                state: nil,
+                hasCompletedOnboarding: false
+            )
+            //try storageService.save(userInfo)
         } catch {
             errorMessage = error.localizedDescription
         }
-        let userInfo = UserInfo(
-            uid: uid,
-            email: email,
-            name: nil,
-            country: nil,
-            state: nil,
-            hasCompletedOnboarding: false
-        )
-
-        //try storageService.save(userInfo)
-
         isLoading = false
     }
     
