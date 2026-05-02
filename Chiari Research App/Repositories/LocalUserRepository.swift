@@ -7,11 +7,16 @@ import Foundation
 
 class LocalUserRepository: UserRepository {
     private let storageService = StorageService()
-    private let userInfoKey = "userInfo"
+    private let userInfoKeyPrefix = "userInfo_"
+    
+    private func userInfoKey(for uid: String) -> String {
+        return userInfoKeyPrefix + uid
+    }
     
     func fetchUser(uid: String) async throws -> UserInfo {
+        let key = userInfoKey(for: uid)
         // Try to load from disk
-        if let data = UserDefaults.standard.data(forKey: userInfoKey),
+        if let data = UserDefaults.standard.data(forKey: key),
            let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
             return userInfo
         }
@@ -21,9 +26,10 @@ class LocalUserRepository: UserRepository {
     }
     
     func updateUser(_ user: UserInfo) async throws {
+        let key = userInfoKey(for: user.uid)
         // Save to UserDefaults
         let encoded = try JSONEncoder().encode(user)
-        UserDefaults.standard.set(encoded, forKey: userInfoKey)
+        UserDefaults.standard.set(encoded, forKey: key)
     }
     
     func createUser(uid: String, email: String) async throws -> UserInfo {
