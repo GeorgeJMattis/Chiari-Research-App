@@ -12,13 +12,14 @@ struct HomeView: View {
     @ObservedObject var surveyViewModel: SurveyViewModel
     @State private var selectedSurvey: SurveySession?
     @State private var showSurveyDetail = false
+    @State private var userInfo: UserInfo?
     
     var body: some View {
         NavigationStack {
             VStack(spacing: 16) {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
-                    Text("Welcome, \(authViewModel.currentUser ?? "User")")
+                    Text("Welcome, \(userInfo?.name ?? "User")")
                         .font(.title2)
                         .bold()
                     Text("Continue with your surveys")
@@ -65,6 +66,26 @@ struct HomeView: View {
             }
             .padding(16)
             .navigationTitle("Home")
+            .onAppear {
+                fetchUserInfo()
+            }
+        }
+    }
+    
+    func fetchUserInfo() {
+        guard let uid = authViewModel.currentUser else { return }
+        
+        let userRepository: UserRepository = LocalUserRepository()
+        
+        Task {
+            do {
+                let fetchedUser = try await userRepository.fetchUser(uid: uid)
+                await MainActor.run {
+                    userInfo = fetchedUser
+                }
+            } catch {
+                print("Error fetching user: \(error)")
+            }
         }
     }
 }
