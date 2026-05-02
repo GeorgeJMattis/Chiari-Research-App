@@ -7,11 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		056D8BBA2FA3FE3E00553B19 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 056D8BB92FA3FE3D00553B19 /* GoogleService-Info.plist */; };
 		05783ACE2F93F74400BBC01F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 05783ACD2F93F74400BBC01F /* FirebaseAuth */; };
 		05783AD02F93F74400BBC01F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 05783ACF2F93F74400BBC01F /* FirebaseFirestore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		056D8BB92FA3FE3D00553B19 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		05783A8D2F9302C700BBC01F /* Chiari Research App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Chiari Research App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -41,6 +43,7 @@
 			children = (
 				05783A8F2F9302C700BBC01F /* Chiari Research App */,
 				05783A8E2F9302C700BBC01F /* Products */,
+				056D8BB92FA3FE3D00553B19 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -121,6 +124,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				056D8BBA2FA3FE3E00553B19 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,6 +267,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QD3CTKGDY3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -294,6 +299,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = QD3CTKGDY3;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

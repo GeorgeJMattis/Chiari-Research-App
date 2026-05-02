@@ -76,7 +76,7 @@ class CMAltimeterService: PressureSampling {
 
                 reads.append(singleRead)
 
-                if reads.count >= 5 {
+                if reads.count >= 20 {
                     self.altimeter.stopRelativeAltitudeUpdates()
                     continuation.resume(returning: reads)
                 }
