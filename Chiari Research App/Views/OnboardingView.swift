@@ -12,13 +12,18 @@ struct OnboardingView: View {
     @State private var state = ""
     @State private var selectedSymptoms: Set<String> = []
     @State private var isLoading = false
+    @State private var submissionError: String?
     
     let allSymptoms = ["Headaches", "Fatigue", "Dizziness", "Neck Pain", "Brain Fog", "Vision Changes", "Balance Issues"]
     let countries = ["United States", "Canada", "Mexico"]
     let usStates = ["California", "Texas", "Florida", "New York", "Pennsylvania", "Illinois", "Ohio", "Georgia", "North Carolina", "Michigan"]
     
     var isFormValid: Bool {
-        !name.isEmpty && !country.isEmpty && !state.isEmpty && selectedSymptoms.contains("Headaches") && selectedSymptoms.count <= 5
+        !name.isEmpty &&
+        !country.isEmpty &&
+        (country != "United States" || !state.isEmpty) &&
+        selectedSymptoms.contains("Headaches") &&
+        selectedSymptoms.count <= 5
     }
 
     var body: some View {
@@ -87,11 +92,12 @@ struct OnboardingView: View {
                         }
                     }
                     .disabled(!isFormValid || isLoading)
-                    
-                    // DEBUG
-                    Text("Debug: name=\(name.isEmpty), country=\(country.isEmpty), state=\(state.isEmpty), headache=\(!selectedSymptoms.contains("Headaches")), count=\(selectedSymptoms.count)")
-                        .font(.caption)
-                        .foregroundStyle(.gray)
+
+                    if let submissionError {
+                        Text(submissionError)
+                            .font(.caption)
+                            .foregroundStyle(.red)
+                    }
                 }
             }
             .navigationTitle("Complete Your Profile")
@@ -101,9 +107,11 @@ struct OnboardingView: View {
     
     func completeOnboarding() {
         isLoading = true
+        submissionError = nil
         
         guard let uid = authViewModel.currentUser else {
             isLoading = false
+            submissionError = "Missing signed-in user."
             return
         }
         
@@ -111,24 +119,25 @@ struct OnboardingView: View {
         
         Task {
             do {
-                // Fetch existing user
-                var userInfo = try await userRepository.fetchUser(uid: uid)
-                
-                // Update with onboarding data
-                userInfo.name = name
-                userInfo.country = country
-                userInfo.state = state
-                userInfo.hasCompletedOnboarding = true
-                
-                // Save updated user
-                try await userRepository.updateUser(userInfo)
-                
-                // Save baseline symptoms
-                let baseline = BaselineInfo(
-                    topFiveSymptoms: Array(selectedSymptoms)
+                let existingUser = try? await userRepository.fetchUser(uid: uid)
+                var userInfo = existingUser ?? UserInfo(
+                    uid: uid,
+                    email: authViewModel.currentUserEmail ?? "",
+                    name: nil,
+                    country: nil,
+                    state: nil,
+                    hasCompletedOnboarding: false
                 )
                 
-                // Mark as completed in authViewModel
+                userInfo.name = name
+                userInfo.country = country
+                userInfo.state = country == "United States" ? state : nil
+                userInfo.hasCompletedOnboarding = true
+                
+                try await userRepository.updateUser(userInfo)
+
+                _ = BaselineInfo(topFiveSymptoms: Array(selectedSymptoms))
+
                 await MainActor.run {
                     authViewModel.hasCompletedOnboarding = true
                     isLoading = false
@@ -136,7 +145,7 @@ struct OnboardingView: View {
             } catch {
                 await MainActor.run {
                     isLoading = false
-                    print("Error completing onboarding: \(error)")
+                    submissionError = error.localizedDescription
                 }
             }
         }
