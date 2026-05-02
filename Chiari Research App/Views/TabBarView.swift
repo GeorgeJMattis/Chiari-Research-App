@@ -1,3 +1,10 @@
+//
+//  TabBarView.swift
+//  Chiari Research App
+//
+
+import SwiftUI
+
 struct TabBarView: View {
     @State private var selectedTab: Tab = .home
     @ObservedObject var authViewModel: AuthViewModel
