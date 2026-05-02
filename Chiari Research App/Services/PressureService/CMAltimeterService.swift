@@ -11,7 +11,7 @@ class CMAltimeterService: PressureSampling {
     func startSampling() async {
         guard timer == nil else { return }
 
-        timer = Timer.scheduledTimer(withTimeInterval: 300, repeats: true) { [weak self] _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in
             guard let self else { return }
 
             Task {
@@ -68,15 +68,13 @@ class CMAltimeterService: PressureSampling {
 
                 let singleRead = PressureData(
                     pressure: data.pressure.doubleValue,
-                    timeStamp: Date(),
                     altitude: data.relativeAltitude.doubleValue,
-                    flightsClimbed: nil,
-                    stepsTaken: nil
+                    timeStamp: Date()
                 )
 
                 reads.append(singleRead)
 
-                if reads.count >= 20 {
+                if reads.count >= 10 {
                     self.altimeter.stopRelativeAltitudeUpdates()
                     continuation.resume(returning: reads)
                 }

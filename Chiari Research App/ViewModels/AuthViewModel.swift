@@ -51,6 +51,16 @@ class AuthViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+        let userInfo = UserInfo(
+            uid: uid,
+            email: email,
+            name: nil,
+            country: nil,
+            state: nil,
+            hasCompletedOnboarding: false
+        )
+
+        //try storageService.save(userInfo)
 
         isLoading = false
     }

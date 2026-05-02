@@ -9,8 +9,6 @@ import Foundation
 
 struct PressureData: Codable {
     let pressure: Double
+    let altitude: Double
     let timeStamp: Date
-    let altitude: Double?
-    let flightsClimbed: Int?
-    let stepsTaken: Int?
 }

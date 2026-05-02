@@ -10,7 +10,7 @@ import Foundation
 struct SurveySession: Codable, Identifiable {
     let id: UUID
     let userId: String
-    let startTime: Date
+    let timeStamp: Date
     var responses: [String: String]
     var isCompleted: Bool
 }
