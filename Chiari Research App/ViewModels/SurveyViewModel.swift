@@ -22,8 +22,8 @@ class SurveyViewModel: ObservableObject {
     private func loadMockSurveys() {
         // Mock data for now
         surveys = [
-            SurveySession(id: UUID(), userId: "user1", startTime: Date(), responses: [:], isCompleted: false),
-            SurveySession(id: UUID(), userId: "user1", startTime: Date().addingTimeInterval(-86400), responses: [:], isCompleted: true),
+            SurveySession(id: UUID(), userId: "user1", timeStamp: Date(), responses: [:], isCompleted: false),
+            SurveySession(id: UUID(), userId: "user1", timeStamp: Date().addingTimeInterval(-86400), responses: [:], isCompleted: true),
         ]
     }
     

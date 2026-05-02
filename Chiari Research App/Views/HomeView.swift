@@ -89,7 +89,7 @@ struct SurveyRowView: View {
                     Text(survey.isCompleted ? "Completed" : "Pending")
                         .font(.caption)
                         .foregroundStyle(survey.isCompleted ? .green : .orange)
-                    Text(survey.startTime.formatted(date: .abbreviated, time: .omitted))
+                    Text(survey.timeStamp.formatted(date: .abbreviated, time: .omitted))
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }

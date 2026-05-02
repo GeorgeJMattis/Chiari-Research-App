@@ -85,7 +85,7 @@ struct SurveyDetailView: View {
     let mockSurvey = SurveySession(
         id: UUID(),
         userId: "user1",
-        startTime: Date(),
+        timeStamp: Date(),
         responses: [:],
         isCompleted: false
     )
