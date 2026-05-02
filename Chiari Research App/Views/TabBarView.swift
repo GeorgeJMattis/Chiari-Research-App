@@ -32,7 +32,7 @@ struct TabBarView: View {
                 .tag(Tab.surveys)
             
             HistoryView()
-                .tabItem { Label("History", systemImage: "graph.fill") }
+                .tabItem { Label("History", systemImage: "chart.bar.fill") }
                 .tag(Tab.history)
             
             ProfileView(authViewModel: authViewModel)
