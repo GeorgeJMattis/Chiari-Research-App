@@ -19,10 +19,12 @@ struct Chiari_Research_AppApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if authViewModel.isLoggedIn {
-                HomeView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
-            } else {
+            if !authViewModel.isLoggedIn {
                 LoginView(authViewModel: authViewModel)
+            } else if ! authViewModlel.hasCompletedBaseline {
+                OnboardingView(authViewModel: authViewModel)
+            } else {
+                TabBarView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
             }
         }
     }
