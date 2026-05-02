@@ -87,6 +87,11 @@ struct OnboardingView: View {
                         }
                     }
                     .disabled(!isFormValid || isLoading)
+                    
+                    // DEBUG
+                    Text("Debug: name=\(name.isEmpty), country=\(country.isEmpty), state=\(state.isEmpty), headache=\(!selectedSymptoms.contains("Headaches")), count=\(selectedSymptoms.count)")
+                        .font(.caption)
+                        .foregroundStyle(.gray)
                 }
             }
             .navigationTitle("Complete Your Profile")
