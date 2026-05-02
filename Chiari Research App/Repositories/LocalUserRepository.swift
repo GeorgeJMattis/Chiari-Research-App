@@ -12,7 +12,7 @@ class LocalUserRepository: UserRepository {
     func fetchUser(uid: String) async throws -> UserInfo {
         // Try to load from disk
         if let data = UserDefaults.standard.data(forKey: userInfoKey),
-           let userInfo = try JSONDecoder().decode(UserInfo.self, from: data) {
+           let userInfo = try? JSONDecoder().decode(UserInfo.self, from: data) {
             return userInfo
         }
         
@@ -31,7 +31,7 @@ class LocalUserRepository: UserRepository {
         let userInfo = UserInfo(
             uid: uid,
             email: email,
-            nickname: nil,
+            name: nil,
             country: nil,
             state: nil,
             hasCompletedOnboarding: false
