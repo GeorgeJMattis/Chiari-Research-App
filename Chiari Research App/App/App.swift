@@ -7,7 +7,6 @@
 
 import SwiftUI
 import FirebaseCore
-import FirebaseAuth
 
 @main
 struct Chiari_Research_AppApp: App {
@@ -15,10 +14,8 @@ struct Chiari_Research_AppApp: App {
     @StateObject var surveyViewModel = SurveyViewModel()
     
     init() {
-        // DEBUG: Clear persistent login to test signup flow
-        try? Auth.auth().signOut()
-        UserDefaults.standard.removeObject(forKey: "userInfo")
         FirebaseApp.configure()
+    }
     }
     
     var body: some Scene {
