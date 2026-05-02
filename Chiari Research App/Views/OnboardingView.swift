@@ -136,9 +136,6 @@ struct OnboardingView: View {
             }
         }
     }
-        
-        isLoading = false
-    }
 }
 
 #Preview {
