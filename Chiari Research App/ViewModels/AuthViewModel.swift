@@ -14,6 +14,7 @@ class AuthViewModel: ObservableObject {
     @Published var currentUser: String? = nil
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
+    @Published var hasCompletedOnboarding = false
 
     private let authService = AuthService()
 

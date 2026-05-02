@@ -21,7 +21,7 @@ struct Chiari_Research_AppApp: App {
         WindowGroup {
             if !authViewModel.isLoggedIn {
                 LoginView(authViewModel: authViewModel)
-            } else if ! authViewModlel.hasCompletedBaseline {
+            } else if !authViewModel.hasCompletedOnboarding {
                 OnboardingView(authViewModel: authViewModel)
             } else {
                 TabBarView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
