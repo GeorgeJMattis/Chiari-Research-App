@@ -18,7 +18,7 @@ class AuthViewModel: ObservableObject {
     @Published var hasCompletedOnboarding = false
 
     private let authService = AuthService()
-    private let userRepository: UserRepository = LocalUserRepository()
+    private let userRepository: UserRepository = FirebaseUserRepository()
 
     init() {
         if let uid = authService.getCurrentUser() {

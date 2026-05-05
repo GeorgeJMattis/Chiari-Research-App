@@ -115,7 +115,7 @@ struct OnboardingView: View {
             return
         }
         
-        let userRepository: UserRepository = LocalUserRepository()
+let userRepository: UserRepository = FirebaseUserRepository()
         
         Task {
             do {
