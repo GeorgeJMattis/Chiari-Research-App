@@ -109,43 +109,18 @@ struct OnboardingView: View {
         isLoading = true
         submissionError = nil
         
-        guard let uid = authViewModel.currentUser else {
-            isLoading = false
-            submissionError = "Missing signed-in user."
-            return
-        }
-        
-let userRepository: UserRepository = FirebaseUserRepository()
-        
         Task {
-            do {
-                let existingUser = try? await userRepository.fetchUser(uid: uid)
-                var userInfo = existingUser ?? UserInfo(
-                    uid: uid,
-                    email: authViewModel.currentUserEmail ?? "",
-                    name: nil,
-                    country: nil,
-                    state: nil,
-                    hasCompletedOnboarding: false
-                )
-                
-                userInfo.name = name
-                userInfo.country = country
-                userInfo.state = country == "United States" ? state : nil
-                userInfo.hasCompletedOnboarding = true
-                
-                try await userRepository.updateUser(userInfo)
-
-                _ = BaselineInfo(topFiveSymptoms: Array(selectedSymptoms))
-
-                await MainActor.run {
-                    authViewModel.hasCompletedOnboarding = true
-                    isLoading = false
-                }
-            } catch {
-                await MainActor.run {
-                    isLoading = false
-                    submissionError = error.localizedDescription
+            await authViewModel.completeOnboarding(
+                name: name,
+                country: country,
+                state: state,
+                symptoms: Array(selectedSymptoms)
+            )
+            
+            await MainActor.run {
+                isLoading = false
+                if let error = authViewModel.errorMessage {
+                    submissionError = error
                 }
             }
         }

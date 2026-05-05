@@ -82,6 +82,39 @@ class AuthViewModel: ObservableObject {
        isLoading = false
     }
 
+    func completeOnboarding(name: String, country: String, state: String?, symptoms: [String]) async {
+        guard let uid = currentUser else {
+            errorMessage = "Missing signed-in user."
+            return
+        }
+        
+        do {
+            let existingUser = try? await userRepository.fetchUser(uid: uid)
+            var userInfo = existingUser ?? UserInfo(
+                uid: uid,
+                email: currentUserEmail ?? "",
+                name: nil,
+                country: nil,
+                state: nil,
+                hasCompletedOnboarding: false
+            )
+            
+            userInfo.name = name
+            userInfo.country = country
+            userInfo.state = country == "United States" ? state : nil
+            userInfo.hasCompletedOnboarding = true
+            
+            try await userRepository.updateUser(userInfo)
+            
+            // Save baseline
+            _ = BaselineInfo(topFiveSymptoms: symptoms)
+            
+            self.hasCompletedOnboarding = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func loadUserState(for uid: String) async {
         do {
             let userInfo = try await userRepository.fetchUser(uid: uid)
