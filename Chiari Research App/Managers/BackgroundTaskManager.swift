@@ -56,10 +56,10 @@ class BackgroundTaskManager {
         
         Task {
             do {
-                // TODO: Collect pressure data
+                CMAltimeterService.startSampling()
                 print("📊 Collecting pressure data...")
                 
-                // TODO: Store locally if offline
+                
                 print("💾 Storing data locally...")
                 
                 // TODO: Sync to server if online

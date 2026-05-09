@@ -17,6 +17,7 @@ class AuthViewModel: ObservableObject {
     @Published var errorMessage: String? = nil
     @Published var hasCompletedOnboarding = false
     @Published var isInitializing = true
+    @Published var userInfo: UserInfo?
 
     private let authService = AuthService()
     private let userRepository: UserRepository = FirebaseUserRepository()
@@ -121,9 +122,10 @@ class AuthViewModel: ObservableObject {
 
     private func loadUserState(for uid: String) async {
         do {
-            let userInfo = try await userRepository.fetchUser(uid: uid)
-            hasCompletedOnboarding = userInfo.hasCompletedOnboarding
-            currentUserEmail = userInfo.email
+            let fetchedUser = try await userRepository.fetchUser(uid: uid)
+            hasCompletedOnboarding = fetchedUser.hasCompletedOnboarding
+            currentUserEmail = fetchedUser.email
+            userInfo = fetchedUser
         } catch {
             hasCompletedOnboarding = false
         }

@@ -19,7 +19,7 @@ struct TabBarView: View {
     }
     var body: some View {
         TabView(selection: $selectedTab) {
-            HomeView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
+            HomeView(authViewModel: authViewModel)
                 .tabItem { Label("Home", systemImage: "house.fill") }
                 .tag(Tab.home)
             
