@@ -16,6 +16,7 @@ class AuthViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
     @Published var hasCompletedOnboarding = false
+    @Published var isInitializing = true
 
     private let authService = AuthService()
     private let userRepository: UserRepository = FirebaseUserRepository()
@@ -28,7 +29,10 @@ class AuthViewModel: ObservableObject {
 
             Task {
                 await loadUserState(for: uid)
+                isInitializing = false
             }
+        } else {
+            isInitializing = false
         }
     }
 

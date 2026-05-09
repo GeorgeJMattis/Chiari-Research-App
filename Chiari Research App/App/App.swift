@@ -19,7 +19,10 @@ struct Chiari_Research_AppApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if !authViewModel.isLoggedIn {
+            if authViewModel.isInitializing {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if !authViewModel.isLoggedIn {
                 LoginView(authViewModel: authViewModel)
             } else if !authViewModel.hasCompletedOnboarding {
                 OnboardingView(authViewModel: authViewModel)
