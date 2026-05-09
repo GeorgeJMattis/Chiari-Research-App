@@ -56,7 +56,6 @@ class BackgroundTaskManager {
         
         Task {
             do {
-                CMAltimeterService.startSampling()
                 print("📊 Collecting pressure data...")
                 
                 
