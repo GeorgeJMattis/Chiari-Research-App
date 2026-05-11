@@ -39,9 +39,13 @@ class CMAltimeterService: PressureSampling {
 
         return await withCheckedContinuation { (continuation: CheckedContinuation<[SensorReading]?, Never>) in
             var reads: [SensorReading] = []
+            var hasResumed = false
 
             altimeter.startRelativeAltitudeUpdates(to: .main) { [weak self] data, error in
+                guard !hasResumed else { return }
+
                 guard let self else {
+                    hasResumed = true
                     continuation.resume(returning: nil)
                     return
                 }
@@ -49,6 +53,7 @@ class CMAltimeterService: PressureSampling {
                 guard let data, error == nil else {
                     print("Error: \(error?.localizedDescription ?? "Unknown error")")
                     self.altimeter.stopRelativeAltitudeUpdates()
+                    hasResumed = true
                     continuation.resume(returning: nil)
                     return
                 }
@@ -62,6 +67,7 @@ class CMAltimeterService: PressureSampling {
 
                 if reads.count >= 10 {
                     self.altimeter.stopRelativeAltitudeUpdates()
+                    hasResumed = true
                     continuation.resume(returning: reads)
                 }
             }

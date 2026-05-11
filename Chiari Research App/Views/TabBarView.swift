@@ -40,6 +40,5 @@ struct TabBarView: View {
                 .tag(Tab.profile)
         }
         .accentColor(.blue)
-    }
 
 }

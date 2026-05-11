@@ -26,7 +26,7 @@ class BackgroundTaskManager {
     /// Schedule the next background task (call after successful login)
     static func schedulePressureCollection() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 10 * 60)  // 10 minutes from now
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 1 * 60)  // 1 minute from now (use 10 * 60 for production)
         
         do {
             try BGTaskScheduler.shared.submit(request)

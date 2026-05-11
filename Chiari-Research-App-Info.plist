@@ -5,6 +5,13 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
 	</array>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.chiari.pressureCollection</string>
+	</array>
+	<key>NSMotionUsageDescription</key>
+	<string>This app uses barometric pressure sensors to collect atmospheric pressure data for Chiari malformation research.</string>
 </dict>
 </plist>

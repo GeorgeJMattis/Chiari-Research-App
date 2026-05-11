@@ -9,6 +9,8 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var authViewModel: AuthViewModel
+    @State private var isMeasuring = false
+    @State private var measurementStatus: String?
 
     var body: some View {
         NavigationStack {
@@ -27,6 +29,33 @@ struct HomeView: View {
                 .background(.gray.opacity(0.1))
                 .clipShape(.rect(cornerRadius: 12))
 
+                // Take Measurement Button
+                Button {
+                    Task {
+                        await takeMeasurement()
+                    }
+                } label: {
+                    HStack {
+                        if isMeasuring {
+                            ProgressView()
+                                .tint(.white)
+                        }
+                        Text(isMeasuring ? "Measuring..." : "Take Measurement")
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .background(isMeasuring ? .blue.opacity(0.5) : .blue)
+                    .foregroundStyle(.white)
+                    .clipShape(.rect(cornerRadius: 8))
+                }
+                .disabled(isMeasuring)
+
+                if let status = measurementStatus {
+                    Text(status)
+                        .font(.caption)
+                        .foregroundStyle(status.contains("Failed") ? .red : .green)
+                }
+
                 Spacer()
 
                 // Logout Button
@@ -44,6 +73,33 @@ struct HomeView: View {
             .padding(16)
             .navigationTitle("Home")
         }
+    }
+
+    private func takeMeasurement() async {
+        guard let uid = authViewModel.currentUser else { return }
+
+        isMeasuring = true
+        measurementStatus = nil
+
+        do {
+            let sensorService = SensorService()
+            try await sensorService.collectAndSave(uid: uid)
+
+            let localRepo = LocalSensorRepository()
+            let firebaseRepo = FirebaseSensorRepository()
+            let unsyncedBatches = try await localRepo.fetchUnsyncedBatches()
+
+            for batch in unsyncedBatches {
+                try await firebaseRepo.saveBatch(batch)
+                try await localRepo.markBatchAsSynced(batchID: batch.id)
+            }
+
+            measurementStatus = "Sent \(unsyncedBatches.count) batch(es)"
+        } catch {
+            measurementStatus = "Failed: \(error.localizedDescription)"
+        }
+
+        isMeasuring = false
     }
 }
 

@@ -27,10 +27,12 @@ class AuthViewModel: ObservableObject {
             isLoggedIn = true
             currentUser = uid
             currentUserEmail = authService.getCurrentUserEmail()
+            UserDefaults.standard.set(uid, forKey: "currentUserUID")
 
             Task {
                 await loadUserState(for: uid)
                 isInitializing = false
+                BackgroundTaskManager.schedulePressureCollection()
             }
         } else {
             isInitializing = false
