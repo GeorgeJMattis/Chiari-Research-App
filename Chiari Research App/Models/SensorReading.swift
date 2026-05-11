@@ -1,4 +1,6 @@
+import Foundation
+
 struct SensorReading: Codable {
     let timestamp: Date
-    let value: [String: Double] // lable value
+    let value: [String: Double]
 }

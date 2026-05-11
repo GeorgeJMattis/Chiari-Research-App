@@ -37,7 +37,7 @@ class CMAltimeterService: PressureSampling {
             return nil
         }
 
-        return await withCheckedContinuation { continuation in
+        return await withCheckedContinuation { (continuation: CheckedContinuation<[SensorReading]?, Never>) in
             var reads: [SensorReading] = []
 
             altimeter.startRelativeAltitudeUpdates(to: .main) { [weak self] data, error in
