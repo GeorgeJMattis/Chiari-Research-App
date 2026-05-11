@@ -26,7 +26,7 @@ class BackgroundTaskManager {
     /// Schedule the next background task (call after successful login)
     static func schedulePressureCollection() {
         let request = BGAppRefreshTaskRequest(identifier: taskIdentifier)
-        request.earliestBeginDate = Date(timeIntervalSinceNow: 1 * 60)  // 1 minute from now (use 10 * 60 for production)
+        request.earliestBeginDate = Date(timeIntervalSinceNow: 10 * 60)  // 10 minutes from now (use 10 * 60 for production)
         
         do {
             try BGTaskScheduler.shared.submit(request)
@@ -68,6 +68,9 @@ class BackgroundTaskManager {
                 let sensorService = SensorService()
                 try await sensorService.collectAndSave(uid: uid)
                 print("💾 Batch saved locally")
+
+                // Give NWPathMonitor time to fire its first path update
+                try await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
 
                 // Sync any unsynced batches if online
                 if NetworkService.shared.isConnected {
