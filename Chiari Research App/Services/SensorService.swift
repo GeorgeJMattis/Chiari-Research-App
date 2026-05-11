@@ -16,7 +16,7 @@ class SensorService {
         #endif
     }
 
-    func startSampling() async{
-        await pressureService.startSampling()
+    func collectAndSave(uid: String) async throws {
+        try await pressureService.collectAndSave(uid: uid)
     }
 }

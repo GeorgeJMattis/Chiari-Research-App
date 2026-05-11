@@ -4,11 +4,7 @@
  */
 protocol PressureSampling {
 
-    func startSampling() async
-    
-    func stopSampling() async
-    
-    func singleRead() async
+    func collectAndSave(uid: String) async throws
 
 }
 

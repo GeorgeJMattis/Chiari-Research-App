@@ -39,7 +39,7 @@ class BackgroundTaskManager {
     // MARK: - Handle Collection
     /// Called by iOS when it's time to collect pressure data
     private static func handlePressureCollection(task: BGAppRefreshTask) {
-        print("🔄 Background task running at \(Date())")
+        print("Background task running at \(Date())")
         
         // Set expiration handler in case iOS stops us early
         task.expirationHandler = {
@@ -56,18 +56,37 @@ class BackgroundTaskManager {
         
         Task {
             do {
+                // Get the stored uid — Firebase Auth may not be ready on background wake
+                guard let uid = UserDefaults.standard.string(forKey: "currentUserUID") else {
+                    print("⚠ No stored uid - skipping collection")
+                    task.setTaskCompleted(success: true)
+                    return
+                }
+
+                // Collect sensor data and save locally
                 print("📊 Collecting pressure data...")
-                
-                
-                print("💾 Storing data locally...")
-                
-                // TODO: Sync to server if online
-                print("☁️ Syncing to server...")
-                
+                let sensorService = SensorService()
+                try await sensorService.collectAndSave(uid: uid)
+                print("💾 Batch saved locally")
+
+                // Sync any unsynced batches if online
+                if NetworkService.shared.isConnected {
+                    print("☁️ Syncing unsynced batches to Firestore...")
+                    let localRepo = LocalSensorRepository()
+                    let firebaseRepo = FirebaseSensorRepository()
+                    let unsyncedBatches = try await localRepo.fetchUnsyncedBatches()
+
+                    for batch in unsyncedBatches {
+                        try await firebaseRepo.saveBatch(batch)
+                        try await localRepo.markBatchAsSynced(batchID: batch.id)
+                    }
+                    print("✅ Synced \(unsyncedBatches.count) batch(es)")
+                } else {
+                    print("📵 Offline - batches will sync later")
+                }
+
                 // Reschedule for next collection
                 schedulePressureCollection()
-                
-                // Mark task complete
                 task.setTaskCompleted(success: true)
                 print("✅ Background task completed successfully")
             } catch {

@@ -15,6 +15,7 @@ struct Chiari_Research_AppApp: App {
     
     init() {
         FirebaseApp.configure()
+        BackgroundTaskManager.registerBackgroundTask()
     }
     
     var body: some Scene {

@@ -1,57 +1,44 @@
 import CoreMotion
 import Foundation
+import UIKit
 
 @MainActor
 class CMAltimeterService: PressureSampling {
     private let altimeter = CMAltimeter()
-    private let storageService = StorageService()
-    private var sessionData: [PressureData] = []
-    private var timer: Timer?
+    private let localRepo = LocalSensorRepository()
 
-    func startSampling() async {
-        guard timer == nil else { return }
-
-        timer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in
-            guard let self else { return }
-
-            Task {
-                let dataPoints = await self.nPressureReads()
-                guard let dataPoints else { return }
-
-                self.sessionData.append(contentsOf: dataPoints)
-
-                if self.sessionData.count >= 10 {
-                    self.storageService.savePressureDataToDisk(self.sessionData)
-                    self.sessionData.removeAll()
-                }
-            }
+    func collectAndSave(uid: String) async throws {
+        guard CMAltimeter.isRelativeAltitudeAvailable() else {
+            print("Altimeter not available on this device.")
+            return
         }
+
+        let dataPoints = await nPressureReads()
+        guard let dataPoints else { return }
+
+        let batch = SensorBatch(
+            id: UUID().uuidString,
+            uid: uid,
+            sensorType: .pressure,
+            startTimeStamp: dataPoints.first?.timestamp,
+            endTimeStamp: dataPoints.last?.timestamp,
+            readings: dataPoints,
+            deviceModel: UIDevice.current.model,
+            appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        )
+
+        try await localRepo.saveBatch(batch)
     }
 
-    func stopSampling() async {
-        timer?.invalidate()
-        timer = nil
 
-        altimeter.stopRelativeAltitudeUpdates()
-
-        if !sessionData.isEmpty {
-            storageService.savePressureDataToDisk(sessionData)
-            sessionData.removeAll()
-        }
-    }
-
-    func singleRead() async {
-        _ = await nPressureReads()
-    }
-
-    private func nPressureReads() async -> [PressureData]? {
+    private func nPressureReads() async -> [SensorReading]? {
         guard CMAltimeter.isRelativeAltitudeAvailable() else {
             print("Altimeter not available on this device.")
             return nil
         }
 
         return await withCheckedContinuation { continuation in
-            var reads: [PressureData] = []
+            var reads: [SensorReading] = []
 
             altimeter.startRelativeAltitudeUpdates(to: .main) { [weak self] data, error in
                 guard let self else {
@@ -66,10 +53,9 @@ class CMAltimeterService: PressureSampling {
                     return
                 }
 
-                let singleRead = PressureData(
-                    pressure: data.pressure.doubleValue,
-                    altitude: data.relativeAltitude.doubleValue,
-                    timeStamp: Date()
+                let singleRead = SensorReading(
+                    timestamp: Date(),
+                    value: ["pressure": data.pressure.doubleValue, "altitude": data.relativeAltitude.doubleValue]
                 )
 
                 reads.append(singleRead)

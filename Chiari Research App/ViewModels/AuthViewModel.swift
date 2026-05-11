@@ -46,6 +46,8 @@ class AuthViewModel: ObservableObject {
             isLoggedIn = true
             currentUser = uid
             currentUserEmail = email
+            UserDefaults.standard.set(uid, forKey: "currentUserUID")
+            BackgroundTaskManager.schedulePressureCollection()
             await loadUserState(for: uid)
         } catch {
             errorMessage = error.localizedDescription
@@ -61,6 +63,7 @@ class AuthViewModel: ObservableObject {
             isLoggedIn = true
             currentUser = uid
             currentUserEmail = email
+            UserDefaults.standard.set(uid, forKey: "currentUserUID")
 
             let userInfo = try await userRepository.createUser(uid: uid, email: email)
             hasCompletedOnboarding = userInfo.hasCompletedOnboarding
@@ -80,6 +83,7 @@ class AuthViewModel: ObservableObject {
             currentUserEmail = nil
             hasCompletedOnboarding = false
             errorMessage = nil
+            UserDefaults.standard.removeObject(forKey: "currentUserUID")
 
        } catch {
             errorMessage = error.localizedDescription
