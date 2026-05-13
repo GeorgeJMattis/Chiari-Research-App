@@ -23,7 +23,9 @@ class FirebaseUserRepository: UserRepository {
             name: data["name"] as? String,
             country: data["country"] as? String,
             state: data["state"] as? String,
-            hasCompletedOnboarding: data["hasCompletedOnboarding"] as? Bool ?? false
+            hasCompletedOnboarding: data["hasCompletedOnboarding"] as? Bool ?? false,
+            studyStartDate: (data["studyStartDate"] as? Timestamp)?.dateValue(),
+            studyDurationDays: data["studyDurationDays"] as? Int ?? 30
         )
         return userInfo
     }
@@ -36,6 +38,8 @@ class FirebaseUserRepository: UserRepository {
             "country": user.country,
             "state": user.state,
             "hasCompletedOnboarding": user.hasCompletedOnboarding,
+            "studyStartDate": user.studyStartDate as Any,
+            "studyDurationDays": user.studyDurationDays,
             "updatedAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(user.uid).setData(data, merge: true)
@@ -50,7 +54,7 @@ class FirebaseUserRepository: UserRepository {
             state: nil,
             hasCompletedOnboarding: false
         )
-        
+
         let data: [String: Any?] = [
             "uid": uid,
             "email": email,
@@ -61,6 +65,17 @@ class FirebaseUserRepository: UserRepository {
             "createdAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(uid).setData(data)
+
+        // Increment global participant counter
+        try await db.collection("stats").document("global").setData(
+            ["participantCount": FieldValue.increment(Int64(1))],
+            merge: true
+        )
         return userInfo
+    }
+
+    func fetchParticipantCount() async throws -> Int {
+        let doc = try await db.collection("stats").document("global").getDocument()
+        return (doc.data()?["participantCount"] as? Int) ?? 0
     }
 }

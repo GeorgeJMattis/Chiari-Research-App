@@ -52,4 +52,10 @@ class LocalSensorRepository: SensorRepository {
         try updatedData.write(to: fileURL)
     }
 
+    func fetchBatches(forUID uid: String, from: Date, to: Date) async throws -> [SensorBatch] {
+        throw NSError(domain: "LocalSensorRepository", code: -1, userInfo: [
+            NSLocalizedDescriptionKey: "Use FirebaseSensorRepository to fetch batches for history"
+        ])
+    }
+
 }

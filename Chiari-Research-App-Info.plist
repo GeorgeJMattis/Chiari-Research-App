@@ -13,5 +13,7 @@
 	</array>
 	<key>NSMotionUsageDescription</key>
 	<string>This app uses barometric pressure sensors to collect atmospheric pressure data for Chiari malformation research.</string>
+	<key>NSUserNotificationUsageDescription</key>
+	<string>We send reminders at 8 AM, 12 PM, 4 PM, and 8 PM to log your daily symptoms as part of the Chiari research study.</string>
 </dict>
 </plist>

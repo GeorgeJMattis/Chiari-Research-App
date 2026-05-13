@@ -33,6 +33,7 @@ class AuthViewModel: ObservableObject {
                 await loadUserState(for: uid)
                 isInitializing = false
                 BackgroundTaskManager.schedulePressureCollection()
+                SurveyScheduler.shared.scheduleDailyNotifications()
             }
         } else {
             isInitializing = false
@@ -50,6 +51,7 @@ class AuthViewModel: ObservableObject {
             currentUserEmail = email
             UserDefaults.standard.set(uid, forKey: "currentUserUID")
             BackgroundTaskManager.schedulePressureCollection()
+            SurveyScheduler.shared.scheduleDailyNotifications()
             await loadUserState(for: uid)
         } catch {
             errorMessage = error.localizedDescription
@@ -114,13 +116,20 @@ class AuthViewModel: ObservableObject {
             userInfo.country = country
             userInfo.state = country == "United States" ? state : nil
             userInfo.hasCompletedOnboarding = true
+            userInfo.studyStartDate = Date()
+            userInfo.studyDurationDays = 30
             
             try await userRepository.updateUser(userInfo)
             
             // Save baseline
             _ = BaselineInfo(topFiveSymptoms: symptoms)
             
+            self.userInfo = userInfo
             self.hasCompletedOnboarding = true
+
+            // Request notification permission now that the user is enrolled
+            _ = await SurveyScheduler.shared.requestPermission()
+            SurveyScheduler.shared.scheduleDailyNotifications()
         } catch {
             errorMessage = error.localizedDescription
         }

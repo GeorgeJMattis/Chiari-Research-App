@@ -11,13 +11,12 @@ import FirebaseCore
 @main
 struct Chiari_Research_AppApp: App {
     @StateObject var authViewModel = AuthViewModel()
-    @StateObject var surveyViewModel = SurveyViewModel()
-    
+
     init() {
         FirebaseApp.configure()
         BackgroundTaskManager.registerBackgroundTask()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             if authViewModel.isInitializing {
@@ -28,7 +27,7 @@ struct Chiari_Research_AppApp: App {
             } else if !authViewModel.hasCompletedOnboarding {
                 OnboardingView(authViewModel: authViewModel)
             } else {
-                TabBarView(authViewModel: authViewModel, surveyViewModel: surveyViewModel)
+                TabBarView(authViewModel: authViewModel)
             }
         }
     }
