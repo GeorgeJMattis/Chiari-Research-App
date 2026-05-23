@@ -17,16 +17,16 @@ struct HistoryView: View {
                     ProgressView("Loading data…")
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else if let err = historyViewModel.errorMessage {
-                    ContentUnavailableView(
-                        "Couldn't load data",
+                    emptyStateView(
+                        title: "Couldn't load data",
                         systemImage: "exclamationmark.triangle",
-                        description: Text(err)
+                        description: err
                     )
                 } else if historyViewModel.surveySessions.isEmpty && historyViewModel.sensorBatches.isEmpty {
-                    ContentUnavailableView(
-                        "No data yet",
+                    emptyStateView(
+                        title: "No data yet",
                         systemImage: "chart.xyaxis.line",
-                        description: Text("Complete surveys and take measurements to see your history.")
+                        description: "Complete surveys and take measurements to see your history."
                     )
                 } else {
                     ScrollView {
@@ -52,10 +52,27 @@ struct HistoryView: View {
                 }
             }
             .task { await historyViewModel.load(uid: uid) }
-            .onChange(of: historyViewModel.range) {
+            .onChange(of: historyViewModel.range) { _ in
                 Task { await historyViewModel.load(uid: uid) }
             }
         }
+    }
+
+    private func emptyStateView(title: String, systemImage: String, description: String) -> some View {
+        VStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+            Text(title)
+                .font(.headline)
+            Text(description)
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding()
     }
 
     // MARK: - Dual-layer Chart
