@@ -36,7 +36,7 @@ struct SurveyDetailView: View {
                     Text(slot.scheduledTime.formatted(date: .omitted, time: .shortened))
                         .font(.subheadline).foregroundStyle(.secondary)
                     if prefill != nil {
-                        Text("Pre-filled from yesterday")
+                        Text("Pre-filled from previous day")
                             .font(.caption).foregroundStyle(.blue)
                     }
                 }

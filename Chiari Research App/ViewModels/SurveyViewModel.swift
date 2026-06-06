@@ -48,10 +48,24 @@ class SurveyViewModel: ObservableObject {
         }
     }
 
-    /// Fetches yesterday's responses for the same slot to pre-fill the form.
+    /// Fetches the most recent responses from BEFORE today for the same slot to pre-fill the form.
+    /// This ensures we never reference a workout from today, only from previous days.
     func fetchPrefill(uid: String, slot: SurveySlot) async -> SurveyResponses? {
-        let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-        return try? await surveyRepo.fetchSession(forUID: uid, date: yesterday, slot: slot)?.responses
+        let today = Calendar.current.startOfDay(for: Date())
+        
+        // Try fetching from previous days, starting with yesterday and going back
+        for daysBack in 1...30 {
+            if let date = Calendar.current.date(byAdding: .day, value: -daysBack, to: today),
+               let session = try? await surveyRepo.fetchSession(forUID: uid, date: date, slot: slot),
+               session.responses != nil {
+                // Make sure the session is from before today (extra safety check)
+                let sessionDay = Calendar.current.startOfDay(for: session.scheduledDate)
+                if sessionDay < today {
+                    return session.responses
+                }
+            }
+        }
+        return nil
     }
 
     func submit(responses: SurveyResponses, uid: String, slot: SurveySlot) async throws {
