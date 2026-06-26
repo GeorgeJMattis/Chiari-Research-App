@@ -1,3 +1,5 @@
+import Foundation
+
 protocol SurveyRepository {
     func saveSurveySession(_ session: SurveySession) async throws
     func fetchSessions(forUID uid: String, from: Date, to: Date) async throws -> [SurveySession]
