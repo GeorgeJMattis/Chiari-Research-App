@@ -19,49 +19,30 @@ class FirebaseUserRepository: UserRepository {
 
         let userInfo = UserInfo(
             uid: uid,
-            email: data["email"] as? String ?? "",
-            name: data["name"] as? String,
-            country: data["country"] as? String,
-            state: data["state"] as? String,
-            hasCompletedOnboarding: data["hasCompletedOnboarding"] as? Bool ?? false,
             studyStartDate: (data["studyStartDate"] as? Timestamp)?.dateValue(),
             studyDurationDays: data["studyDurationDays"] as? Int ?? 30
         )
         return userInfo
     }
-    
+
     func updateUser(_ user: UserInfo) async throws {
         let data: [String: Any?] = [
             "uid": user.uid,
-            "email": user.email,
-            "name": user.name,
-            "country": user.country,
-            "state": user.state,
-            "hasCompletedOnboarding": user.hasCompletedOnboarding,
             "studyStartDate": user.studyStartDate as Any,
             "studyDurationDays": user.studyDurationDays,
             "updatedAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(user.uid).setData(data, merge: true)
     }
-    
-    func createUser(uid: String, email: String) async throws -> UserInfo {
-        let userInfo = UserInfo(
-            uid: uid,
-            email: email,
-            name: nil,
-            country: nil,
-            state: nil,
-            hasCompletedOnboarding: false
-        )
+
+    func createUser(uid: String) async throws -> UserInfo {
+        let now = Date()
+        let userInfo = UserInfo(uid: uid, studyStartDate: now, studyDurationDays: 30)
 
         let data: [String: Any?] = [
             "uid": uid,
-            "email": email,
-            "name": nil,
-            "country": nil,
-            "state": nil,
-            "hasCompletedOnboarding": false,
+            "studyStartDate": now,
+            "studyDurationDays": 30,
             "createdAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(uid).setData(data)

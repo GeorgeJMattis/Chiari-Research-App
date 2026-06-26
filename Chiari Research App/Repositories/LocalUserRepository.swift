@@ -32,18 +32,9 @@ class LocalUserRepository: UserRepository {
         UserDefaults.standard.set(encoded, forKey: key)
     }
     
-    func createUser(uid: String, email: String) async throws -> UserInfo {
-        // Create new user with just uid and email
-        let userInfo = UserInfo(
-            uid: uid,
-            email: email,
-            name: nil,
-            country: nil,
-            state: nil,
-            hasCompletedOnboarding: false
-        )
-        
-        // Save to local storage
+    func createUser(uid: String) async throws -> UserInfo {
+        // Anonymous participant record — just the uid and study dates.
+        let userInfo = UserInfo(uid: uid, studyStartDate: Date(), studyDurationDays: 30)
         try await updateUser(userInfo)
         return userInfo
     }

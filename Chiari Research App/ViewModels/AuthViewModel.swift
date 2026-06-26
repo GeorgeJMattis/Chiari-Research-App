@@ -12,21 +12,19 @@ import Combine
 class AuthViewModel: ObservableObject {
     @Published var isLoggedIn = false
     @Published var currentUser: String? = nil
-    @Published var currentUserEmail: String? = nil
     @Published var isLoading = false
     @Published var errorMessage: String? = nil
-    @Published var hasCompletedOnboarding = false
     @Published var isInitializing = true
     @Published var userInfo: UserInfo?
 
     private let authService = AuthService()
     private let userRepository: UserRepository = FirebaseUserRepository()
+    private let enrollmentRepository: EnrollmentRepository = FirebaseEnrollmentRepository()
 
     init() {
         if let uid = authService.getCurrentUser() {
             isLoggedIn = true
             currentUser = uid
-            currentUserEmail = authService.getCurrentUserEmail()
             UserDefaults.standard.set(uid, forKey: "currentUserUID")
 
             Task {
@@ -40,109 +38,65 @@ class AuthViewModel: ObservableObject {
         }
     }
 
-    func login(email: String, password: String) async {
+    /// Enrolls the participant anonymously: signs in, creates their study
+    /// record, and starts background collection + survey reminders. There is no
+    /// separate onboarding step — sign-in is enrollment.
+    func signInAnonymously() async {
         isLoading = true
         errorMessage = nil
-
         do {
-            let uid = try await authService.login(email: email, password: password)
+            let uid = try await authService.signInAnonymously()
             isLoggedIn = true
             currentUser = uid
-            currentUserEmail = email
             UserDefaults.standard.set(uid, forKey: "currentUserUID")
+
+            userInfo = try await userRepository.createUser(uid: uid)
+
             BackgroundTaskManager.schedulePressureCollection()
-            SurveyScheduler.shared.scheduleDailyNotifications()
-            await loadUserState(for: uid)
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
-    }
-
-    func signUp(email: String, password: String) async {
-        isLoading = true
-        errorMessage = nil
-        do {
-            let uid = try await authService.signUp(email: email, password: password)
-            isLoggedIn = true
-            currentUser = uid
-            currentUserEmail = email
-            UserDefaults.standard.set(uid, forKey: "currentUserUID")
-
-            let userInfo = try await userRepository.createUser(uid: uid, email: email)
-            hasCompletedOnboarding = userInfo.hasCompletedOnboarding
-        } catch {
-            errorMessage = error.localizedDescription
-        }
-        isLoading = false
-    }
-    
-    func logout() {
-        isLoading = true
-        errorMessage = nil
-        do { 
-            try authService.logout()
-            isLoggedIn = false
-            currentUser = nil
-            currentUserEmail = nil
-            hasCompletedOnboarding = false
-            errorMessage = nil
-            UserDefaults.standard.removeObject(forKey: "currentUserUID")
-
-       } catch {
-            errorMessage = error.localizedDescription
-       }
-       isLoading = false
-    }
-
-    func completeOnboarding(name: String, country: String, state: String?, symptoms: [String]) async {
-        guard let uid = currentUser else {
-            errorMessage = "Missing signed-in user."
-            return
-        }
-        
-        do {
-            let existingUser = try? await userRepository.fetchUser(uid: uid)
-            var userInfo = existingUser ?? UserInfo(
-                uid: uid,
-                email: currentUserEmail ?? "",
-                name: nil,
-                country: nil,
-                state: nil,
-                hasCompletedOnboarding: false
-            )
-            
-            userInfo.name = name
-            userInfo.country = country
-            userInfo.state = country == "United States" ? state : nil
-            userInfo.hasCompletedOnboarding = true
-            userInfo.studyStartDate = Date()
-            userInfo.studyDurationDays = 30
-            
-            try await userRepository.updateUser(userInfo)
-            
-            // Save baseline
-            _ = BaselineInfo(topFiveSymptoms: symptoms)
-            
-            self.userInfo = userInfo
-            self.hasCompletedOnboarding = true
-
-            // Request notification permission now that the user is enrolled
             _ = await SurveyScheduler.shared.requestPermission()
             SurveyScheduler.shared.scheduleDailyNotifications()
         } catch {
             errorMessage = error.localizedDescription
         }
+        isLoading = false
+    }
+
+    /// Completes ResearchKit enrollment: signs the participant in anonymously,
+    /// then records their consent + baseline symptoms. Called when the consent
+    /// task finishes successfully.
+    func enroll(symptoms: [String]) async {
+        await signInAnonymously()
+        guard errorMessage == nil, let uid = currentUser else { return }
+        do {
+            try await enrollmentRepository.saveEnrollment(uid: uid, symptoms: symptoms, consentDate: Date())
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func logout() {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try authService.logout()
+            isLoggedIn = false
+            currentUser = nil
+            userInfo = nil
+            errorMessage = nil
+            UserDefaults.standard.removeObject(forKey: "currentUserUID")
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
     private func loadUserState(for uid: String) async {
         do {
-            let fetchedUser = try await userRepository.fetchUser(uid: uid)
-            hasCompletedOnboarding = fetchedUser.hasCompletedOnboarding
-            currentUserEmail = fetchedUser.email
-            userInfo = fetchedUser
+            userInfo = try await userRepository.fetchUser(uid: uid)
         } catch {
-            hasCompletedOnboarding = false
+            // Signed-in session with no study record yet — create one so the
+            // app has study dates to work with.
+            userInfo = try? await userRepository.createUser(uid: uid)
         }
     }
 }

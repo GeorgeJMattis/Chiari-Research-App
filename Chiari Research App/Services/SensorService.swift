@@ -9,11 +9,10 @@ class SensorService {
     private let pressureService: PressureSampling
 
     init() {
-        #if SENSORKIT_ENABLED
-        self.pressureService = SensorKitPressureSampling()
-        #else
+        // Live barometric pressure always comes from CMAltimeter. SensorKit is
+        // a separate, fetch-based source (SensorKitManager) that runs alongside
+        // this rather than replacing it, because SensorKit data is delayed 24h.
         self.pressureService = CMAltimeterService()
-        #endif
     }
 
     func collectAndSave(uid: String) async throws {

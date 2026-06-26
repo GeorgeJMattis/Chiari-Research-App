@@ -9,17 +9,12 @@ import FirebaseAuth
 import Foundation
 
 class AuthService {
-    func signUp(email: String, password: String) async throws -> String {
-        let result = try await Auth.auth().createUser(withEmail: email, password: password)
-        let uid = result.user.uid
-        return uid
-    }
-    
-    func login(email: String, password: String) async throws -> String {
-        let result = try await Auth.auth().signIn(withEmail: email, password: password)
-        let uid = result.user.uid
-
-        return uid
+    /// Signs the participant in anonymously. Firebase issues a persistent UID
+    /// with no email/password. Requires Anonymous auth to be enabled in the
+    /// Firebase console (Authentication → Sign-in method → Anonymous).
+    func signInAnonymously() async throws -> String {
+        let result = try await Auth.auth().signInAnonymously()
+        return result.user.uid
     }
 
     func logout() throws {
@@ -28,9 +23,5 @@ class AuthService {
 
     func getCurrentUser() -> String? {
         return Auth.auth().currentUser?.uid
-    }
-
-    func getCurrentUserEmail() -> String? {
-        return Auth.auth().currentUser?.email
     }
 }
