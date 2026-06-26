@@ -4,86 +4,86 @@
 //
 //  Created by George Mattis on 4/29/26.
 //
+//  Hosts WelcomeView (anonymous enrollment). When RESEARCHKIT_ENABLED is set,
+//  "Join Study" presents the ResearchKit consent + baseline survey; otherwise
+//  it signs in anonymously directly (so the app builds before the ResearchKit
+//  package is added). The file can be renamed to WelcomeView.swift in Xcode.
+//
 
 import SwiftUI
 
-struct LoginView: View {
+struct WelcomeView: View {
     @ObservedObject var authViewModel: AuthViewModel
-    @State private var email = ""
-    @State private var password = ""
-    @State private var isSigningUp = false
-    
+    @State private var showEnrollment = false
+
     var body: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 24) {
+            Spacer()
+
             VStack(spacing: 10) {
                 Text("Chiari Research")
-                    .font(.title)
+                    .font(.largeTitle)
                     .bold()
                 Text("Beta")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            .padding(.bottom, 40)
-            
-            VStack(spacing: 15) {
-                TextField("Email", text: $email)
-                    .textFieldStyle(.roundedBorder)
-                    .keyboardType(.emailAddress)
-                    .textInputAutocapitalization(.never)
-                
-                SecureField("Password", text: $password)
-                    .textFieldStyle(.roundedBorder)
-            }
-            .padding(.bottom, 20)
-            
+
+            Text("Join the study anonymously. We never collect your name, email, or any personal identifiers — only the sensor and symptom data you choose to share.")
+                .font(.callout)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 24)
+
             if let errorMessage = authViewModel.errorMessage {
                 Text(errorMessage)
                     .foregroundStyle(.red)
                     .font(.caption)
             }
-            
-            Button(action: {
-                Task {
-                    if isSigningUp {
-                        await authViewModel.signUp(email: email, password: password)
-                    } else {
-                        await authViewModel.login(email: email, password: password)
-                    }
-                }
-            }) {
+
+            Spacer()
+
+            Button(action: joinTapped) {
                 if authViewModel.isLoading {
                     ProgressView()
                         .tint(.white)
                 } else {
-                    Text(isSigningUp ? "Sign Up" : "Sign In")
+                    Text("Join Study")
                 }
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
+            .padding(.vertical, 14)
             .background(.blue)
             .foregroundStyle(.white)
-            .clipShape(.rect(cornerRadius: 8))
+            .clipShape(.rect(cornerRadius: 10))
             .disabled(authViewModel.isLoading)
-            .padding(.bottom, 20)
-            
-            Button(action: {
-                isSigningUp.toggle()
-            }) {
-                Text(isSigningUp ? "Already have an account? Sign In" : "Don't have an account? Sign Up")
-                    .font(.footnote)
-                    .foregroundStyle(.blue)
-            }
-            
-            Spacer()
-            
-            Text("Demo: Use any email/password")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
         }
-        .padding(20)
+        .padding(24)
+        #if RESEARCHKIT_ENABLED
+        .fullScreenCover(isPresented: $showEnrollment) {
+            ResearchKitTaskView(task: EnrollmentTask.make()) { symptoms in
+                showEnrollment = false
+                Task { await authViewModel.enroll(symptoms: symptoms) }
+            } onCancel: {
+                showEnrollment = false
+            }
+            .ignoresSafeArea()
+        }
+        #endif
+    }
+
+    private func joinTapped() {
+        #if RESEARCHKIT_ENABLED
+        // Present consent + baseline survey; enrollment completes in the
+        // task's completion handler above.
+        showEnrollment = true
+        #else
+        // No ResearchKit yet — enroll directly.
+        Task { await authViewModel.signInAnonymously() }
+        #endif
     }
 }
 
 #Preview {
-    LoginView(authViewModel: AuthViewModel())
+    WelcomeView(authViewModel: AuthViewModel())
 }

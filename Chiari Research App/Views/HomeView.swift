@@ -25,12 +25,6 @@ struct HomeView: View {
                 .padding(16)
             }
             .navigationTitle("Home")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Log Out") { authViewModel.logout() }
-                        .foregroundStyle(.red)
-                }
-            }
             .task {
                 guard let uid = authViewModel.currentUser,
                       let info = authViewModel.userInfo else { return }

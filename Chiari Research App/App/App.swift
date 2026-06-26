@@ -11,6 +11,7 @@ import FirebaseCore
 @main
 struct Chiari_Research_AppApp: App {
     @StateObject var authViewModel = AuthViewModel()
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         FirebaseApp.configure()
@@ -19,16 +20,25 @@ struct Chiari_Research_AppApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if authViewModel.isInitializing {
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-            } else if !authViewModel.isLoggedIn {
-                LoginView(authViewModel: authViewModel)
-            } else if !authViewModel.hasCompletedOnboarding {
-                OnboardingView(authViewModel: authViewModel)
-            } else {
-                TabBarView(authViewModel: authViewModel)
+            Group {
+                if authViewModel.isInitializing {
+                    ProgressView()
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if !authViewModel.isLoggedIn {
+                    WelcomeView(authViewModel: authViewModel)
+                } else {
+                    TabBarView(authViewModel: authViewModel)
+                }
             }
+            #if SENSORKIT_ENABLED
+            .onChange(of: scenePhase) { phase in
+                // Fetch any newly-available (24h-embargoed) SensorKit data each
+                // time the app comes to the foreground for a signed-in user.
+                guard phase == .active,
+                      let uid = UserDefaults.standard.string(forKey: "currentUserUID") else { return }
+                SensorKitManager.shared.activateAndFetch(uid: uid)
+            }
+            #endif
         }
     }
 }
