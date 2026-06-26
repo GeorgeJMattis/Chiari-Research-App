@@ -12,7 +12,11 @@
 //
 
 #if RESEARCHKIT_ENABLED
+// The StanfordBDHG ResearchKit fork splits the framework into modules:
+// core task/consent model types live in `ResearchKit`, UI step classes in
+// `ResearchKitUI`. Both products must be added to the target in Xcode.
 import ResearchKit
+import ResearchKitUI
 
 enum EnrollmentTask {
     static let taskID = "enrollment"

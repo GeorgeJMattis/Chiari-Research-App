@@ -13,7 +13,10 @@
 
 #if RESEARCHKIT_ENABLED
 import SwiftUI
+// ORKTaskViewController + delegate live in ResearchKitUI; the task/result model
+// types in ResearchKit. Add both products to the target in Xcode.
 import ResearchKit
+import ResearchKitUI
 
 struct ResearchKitTaskView: UIViewControllerRepresentable {
     let task: ORKOrderedTask
