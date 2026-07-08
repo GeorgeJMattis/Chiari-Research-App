@@ -9,9 +9,10 @@ struct TabBarView: View {
     @State private var selectedTab: Tab = .home
     @ObservedObject var authViewModel: AuthViewModel
 
-    @StateObject private var surveyViewModel  = SurveyViewModel()
-    @StateObject private var homeViewModel    = HomeViewModel()
-    @StateObject private var historyViewModel = HistoryViewModel()
+    @StateObject private var surveyViewModel   = SurveyViewModel()
+    @StateObject private var homeViewModel     = HomeViewModel()
+    @StateObject private var historyViewModel  = HistoryViewModel()
+    @StateObject private var baselineViewModel = BaselineViewModel()
 
     enum Tab: Int {
         case home = 0
@@ -26,14 +27,19 @@ struct TabBarView: View {
             HomeView(
                 authViewModel: authViewModel,
                 homeViewModel: homeViewModel,
-                surveyViewModel: surveyViewModel
+                surveyViewModel: surveyViewModel,
+                baselineViewModel: baselineViewModel,
+                onOpenBaseline: { selectedTab = .baseline }
             )
             .tabItem { Label("Home", systemImage: "house.fill") }
             .tag(Tab.home)
 
-            BaselineView()
-                .tabItem { Label("Baseline", systemImage: "waveform") }
-                .tag(Tab.baseline)
+            BaselineView(
+                baselineViewModel: baselineViewModel,
+                uid: authViewModel.currentUser ?? ""
+            )
+            .tabItem { Label("Baseline", systemImage: "waveform") }
+            .tag(Tab.baseline)
 
             SurveyView(
                 surveyViewModel: surveyViewModel,

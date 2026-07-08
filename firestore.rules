@@ -44,6 +44,14 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    match /baselineResponses/{docId} {
+      allow read: if isSignedIn()
+                  && resource.data.uid == request.auth.uid;
+      allow create, update: if isSignedIn()
+                  && request.resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
     // --- Global, non-sensitive study stats ---
     // The participant counter is incremented client-side via
     // FieldValue.increment on enrollment, so it must be client-writable.

@@ -9,12 +9,16 @@ struct HomeView: View {
     @ObservedObject var authViewModel: AuthViewModel
     @ObservedObject var homeViewModel: HomeViewModel
     @ObservedObject var surveyViewModel: SurveyViewModel
+    @ObservedObject var baselineViewModel: BaselineViewModel
+    /// Switches the tab bar to the Baseline tab.
+    var onOpenBaseline: () -> Void = {}
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 20) {
                     studyHeader
+                    baselineReminder
                     calendarSection
                     todaysSurveys
                 }
@@ -22,10 +26,43 @@ struct HomeView: View {
             }
             .navigationTitle("Home")
             .task {
-                guard let uid = authViewModel.currentUser,
-                      let info = authViewModel.userInfo else { return }
-                await homeViewModel.load(uid: uid, userInfo: info)
+                guard let uid = authViewModel.currentUser else { return }
+                if let info = authViewModel.userInfo {
+                    await homeViewModel.load(uid: uid, userInfo: info)
+                }
+                await baselineViewModel.load(uid: uid)
             }
+        }
+    }
+
+    // MARK: - Baseline Reminder
+
+    @ViewBuilder
+    private var baselineReminder: some View {
+        if !baselineViewModel.allCompleted {
+            Button(action: onOpenBaseline) {
+                HStack(spacing: 12) {
+                    Image(systemName: "list.clipboard.fill")
+                        .font(.title2)
+                        .foregroundStyle(.blue)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Baseline surveys")
+                            .font(.subheadline).bold()
+                            .foregroundStyle(.primary)
+                        Text("\(baselineViewModel.completedCount) of \(baselineViewModel.totalCount) completed — tap to continue")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(14)
+                .background(.blue.opacity(0.08))
+                .clipShape(.rect(cornerRadius: 14))
+            }
+            .buttonStyle(.plain)
         }
     }
 
@@ -207,7 +244,8 @@ private struct MiniSlotBadge: View {
     HomeView(
         authViewModel: AuthViewModel(),
         homeViewModel: HomeViewModel(),
-        surveyViewModel: SurveyViewModel()
+        surveyViewModel: SurveyViewModel(),
+        baselineViewModel: BaselineViewModel()
     )
 }
 
