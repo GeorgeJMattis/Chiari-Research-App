@@ -41,13 +41,13 @@ struct ResearchKitTaskView: UIViewControllerRepresentable {
         }
 
         func taskViewController(_ taskViewController: ORKTaskViewController,
-                                didFinishWith reason: ORKTaskViewControllerFinishReason,
+                                didFinishWith reason: ORKTaskFinishReason,
                                 error: Error?) {
             switch reason {
             case .completed:
                 parent.onComplete(Self.selectedSymptoms(from: taskViewController.result))
             default:
-                // .discarded, .failed, .saved → treat as not enrolled.
+                // .discarded, .failed, .saved, .earlyTermination → treat as not enrolled.
                 parent.onCancel()
             }
         }

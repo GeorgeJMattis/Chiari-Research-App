@@ -1,0 +1,12 @@
+{
+  "name": "chiari-research-tools",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Admin-side data export for the Chiari Research App (not shipped in the app).",
+  "scripts": {
+    "export": "node export-data.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  }
+}

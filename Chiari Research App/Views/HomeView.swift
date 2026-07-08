@@ -10,9 +10,6 @@ struct HomeView: View {
     @ObservedObject var homeViewModel: HomeViewModel
     @ObservedObject var surveyViewModel: SurveyViewModel
 
-    @State private var isMeasuring = false
-    @State private var measurementStatus: String?
-
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -20,7 +17,6 @@ struct HomeView: View {
                     studyHeader
                     calendarSection
                     todaysSurveys
-                    measurementButton
                 }
                 .padding(16)
             }
@@ -111,33 +107,6 @@ struct HomeView: View {
         .clipShape(.rect(cornerRadius: 14))
     }
 
-    // MARK: - Measurement Button
-
-    private var measurementButton: some View {
-        VStack(spacing: 8) {
-            Button {
-                Task { await takeMeasurement() }
-            } label: {
-                HStack {
-                    if isMeasuring { ProgressView().tint(.white) }
-                    Text(isMeasuring ? "Measuring..." : "Take Manual Measurement")
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 12)
-                .background(isMeasuring ? .blue.opacity(0.5) : .blue)
-                .foregroundStyle(.white)
-                .clipShape(.rect(cornerRadius: 8))
-            }
-            .disabled(isMeasuring)
-
-            if let status = measurementStatus {
-                Text(status)
-                    .font(.caption)
-                    .foregroundStyle(status.contains("Failed") ? .red : .green)
-            }
-        }
-    }
-
     // MARK: - Helpers
 
     private func studyDays() -> [Date] {
@@ -162,27 +131,6 @@ struct HomeView: View {
 
     private func leadingBlanks(for date: Date) -> Int {
         Calendar.current.component(.weekday, from: date) - 1
-    }
-
-    private func takeMeasurement() async {
-        guard let uid = authViewModel.currentUser else { return }
-        isMeasuring = true
-        measurementStatus = nil
-        do {
-            let sensorService = SensorService()
-            try await sensorService.collectAndSave(uid: uid)
-            let localRepo   = LocalSensorRepository()
-            let firebaseRepo = FirebaseSensorRepository()
-            let unsynced    = try await localRepo.fetchUnsyncedBatches()
-            for batch in unsynced {
-                try await firebaseRepo.saveBatch(batch)
-                try await localRepo.markBatchAsSynced(batchID: batch.id)
-            }
-            measurementStatus = "Sent \(unsynced.count) batch(es)"
-        } catch {
-            measurementStatus = "Failed: \(error.localizedDescription)"
-        }
-        isMeasuring = false
     }
 }
 

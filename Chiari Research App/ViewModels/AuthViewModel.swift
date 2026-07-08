@@ -41,7 +41,7 @@ class AuthViewModel: ObservableObject {
     /// Enrolls the participant anonymously: signs in, creates their study
     /// record, and starts background collection + survey reminders. There is no
     /// separate onboarding step — sign-in is enrollment.
-    func signInAnonymously() async {
+    func signInAnonymously(country: String? = nil, stateRegion: String? = nil) async {
         isLoading = true
         errorMessage = nil
         do {
@@ -50,7 +50,7 @@ class AuthViewModel: ObservableObject {
             currentUser = uid
             UserDefaults.standard.set(uid, forKey: "currentUserUID")
 
-            userInfo = try await userRepository.createUser(uid: uid)
+            userInfo = try await userRepository.createUser(uid: uid, country: country, stateRegion: stateRegion)
 
             BackgroundTaskManager.schedulePressureCollection()
             _ = await SurveyScheduler.shared.requestPermission()
@@ -64,14 +64,30 @@ class AuthViewModel: ObservableObject {
     /// Completes ResearchKit enrollment: signs the participant in anonymously,
     /// then records their consent + baseline symptoms. Called when the consent
     /// task finishes successfully.
-    func enroll(symptoms: [String]) async {
-        await signInAnonymously()
+    func enroll(symptoms: [String], country: String? = nil, stateRegion: String? = nil) async {
+        await signInAnonymously(country: country, stateRegion: stateRegion)
         guard errorMessage == nil, let uid = currentUser else { return }
         do {
             try await enrollmentRepository.saveEnrollment(uid: uid, symptoms: symptoms, consentDate: Date())
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    /// Updates the participant's editable geography and persists it.
+    func updateGeography(country: String?, stateRegion: String?) async {
+        guard var info = userInfo else { return }
+        isLoading = true
+        errorMessage = nil
+        info.country = country
+        info.stateRegion = stateRegion
+        do {
+            try await userRepository.updateUser(info)
+            userInfo = info
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 
     func logout() {

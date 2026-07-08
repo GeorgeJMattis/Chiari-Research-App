@@ -9,30 +9,76 @@ struct ProfileView: View {
     @ObservedObject var authViewModel: AuthViewModel
     @State private var showLeaveConfirmation = false
 
+    @State private var country = ""
+    @State private var stateRegion = ""
+    @State private var showSaved = false
+
+    /// Whether the edited geography differs from what's stored.
+    private var hasChanges: Bool {
+        country != (authViewModel.userInfo?.country ?? "")
+            || stateRegion != (authViewModel.userInfo?.stateRegion ?? "")
+    }
+
+    private var canSave: Bool {
+        guard !country.isEmpty, hasChanges, !authViewModel.isLoading else { return false }
+        if country == Geography.unitedStates { return !stateRegion.isEmpty }
+        return true
+    }
+
     var body: some View {
         NavigationStack {
-            VStack {
-                Text("Profile View")
-                    .font(.title)
-                Text("Participant: \(authViewModel.currentUser ?? "Unknown")")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
+            Form {
+                Section("Location") {
+                    GeographyPicker(country: $country, stateRegion: $stateRegion)
+                }
 
-                Spacer()
+                Section {
+                    Button {
+                        Task {
+                            await authViewModel.updateGeography(
+                                country: country.isEmpty ? nil : country,
+                                stateRegion: stateRegion.isEmpty ? nil : stateRegion
+                            )
+                            if authViewModel.errorMessage == nil { showSaved = true }
+                        }
+                    } label: {
+                        HStack {
+                            Text("Save Changes")
+                            if authViewModel.isLoading {
+                                Spacer()
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .disabled(!canSave)
+                }
 
-                Button(role: .destructive) {
-                    showLeaveConfirmation = true
-                } label: {
-                    Text("Leave Study")
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .background(.red.opacity(0.2))
-                        .foregroundStyle(.red)
-                        .clipShape(.rect(cornerRadius: 8))
+                Section("Participant") {
+                    Text(authViewModel.currentUser ?? "Unknown")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .textSelection(.enabled)
+                }
+
+                Section {
+                    Button(role: .destructive) {
+                        showLeaveConfirmation = true
+                    } label: {
+                        Text("Leave Study")
+                            .frame(maxWidth: .infinity)
+                    }
                 }
             }
-            .padding()
             .navigationTitle("Profile")
+            .onAppear {
+                country = authViewModel.userInfo?.country ?? ""
+                stateRegion = authViewModel.userInfo?.stateRegion ?? ""
+            }
+            .alert("Saved", isPresented: $showSaved) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text("Your location has been updated.")
+            }
             .alert("Leave the study?", isPresented: $showLeaveConfirmation) {
                 Button("Cancel", role: .cancel) {}
                 Button("Leave Study", role: .destructive) {

@@ -1,0 +1,61 @@
+rules_version = '2';
+
+// Chiari Research App — Firestore security rules.
+//
+// The app uses anonymous Firebase Auth. Every participant is identified only by
+// their anonymous UID. Ownership of survey/sensor documents lives in a *field*
+// (`userId` on surveySessions, `uid` on sensorBatches / users / enrollments),
+// not in the document path, so the rules below check those fields directly.
+//
+// Deploy with:  firebase deploy --only firestore:rules
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // --- Per-user records keyed by UID in the document path ---
+
+    match /users/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    match /enrollments/{uid} {
+      allow read, write: if isSignedIn() && request.auth.uid == uid;
+    }
+
+    // --- Flat collections where ownership is a document field ---
+
+    match /surveySessions/{docId} {
+      allow read: if isSignedIn()
+                  && resource.data.userId == request.auth.uid;
+      allow create, update: if isSignedIn()
+                  && request.resource.data.userId == request.auth.uid;
+      allow delete: if false;
+    }
+
+    match /sensorBatches/{docId} {
+      allow read: if isSignedIn()
+                  && resource.data.uid == request.auth.uid;
+      allow create, update: if isSignedIn()
+                  && request.resource.data.uid == request.auth.uid;
+      allow delete: if false;
+    }
+
+    // --- Global, non-sensitive study stats ---
+    // The participant counter is incremented client-side via
+    // FieldValue.increment on enrollment, so it must be client-writable.
+    // It holds only an aggregate count (no participant data).
+    match /stats/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Deny everything not explicitly matched above.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

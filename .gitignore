@@ -1,0 +1,17 @@
+# Firebase Admin service-account key — grants full read access to all
+# participant data. NEVER commit this.
+service-account.json
+tools/service-account.json
+*serviceAccount*.json
+
+# Node (export tooling)
+node_modules/
+tools/node_modules/
+tools/exports/
+
+# macOS
+.DS_Store
+
+# Xcode user state
+xcuserdata/
+*.xcuserstate

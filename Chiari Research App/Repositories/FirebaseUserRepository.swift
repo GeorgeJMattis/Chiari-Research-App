@@ -20,7 +20,9 @@ class FirebaseUserRepository: UserRepository {
         let userInfo = UserInfo(
             uid: uid,
             studyStartDate: (data["studyStartDate"] as? Timestamp)?.dateValue(),
-            studyDurationDays: data["studyDurationDays"] as? Int ?? 30
+            studyDurationDays: data["studyDurationDays"] as? Int ?? 30,
+            country: data["country"] as? String,
+            stateRegion: data["stateRegion"] as? String
         )
         return userInfo
     }
@@ -30,19 +32,23 @@ class FirebaseUserRepository: UserRepository {
             "uid": user.uid,
             "studyStartDate": user.studyStartDate as Any,
             "studyDurationDays": user.studyDurationDays,
+            "country": user.country as Any,
+            "stateRegion": user.stateRegion as Any,
             "updatedAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(user.uid).setData(data, merge: true)
     }
 
-    func createUser(uid: String) async throws -> UserInfo {
+    func createUser(uid: String, country: String?, stateRegion: String?) async throws -> UserInfo {
         let now = Date()
-        let userInfo = UserInfo(uid: uid, studyStartDate: now, studyDurationDays: 30)
+        let userInfo = UserInfo(uid: uid, studyStartDate: now, studyDurationDays: 30, country: country, stateRegion: stateRegion)
 
         let data: [String: Any?] = [
             "uid": uid,
             "studyStartDate": now,
             "studyDurationDays": 30,
+            "country": country as Any,
+            "stateRegion": stateRegion as Any,
             "createdAt": FieldValue.serverTimestamp()
         ]
         try await db.collection("users").document(uid).setData(data)
