@@ -17,9 +17,15 @@ class AuthViewModel: ObservableObject {
     @Published var isInitializing = true
     @Published var userInfo: UserInfo?
 
-    private let authService = AuthService()
+    #if UI_ONLY_BETA
+    private let authService: AuthServicing = MockAuthService()
+    private let userRepository: UserRepository = MockUserRepository()
+    private let enrollmentRepository: EnrollmentRepository = MockEnrollmentRepository()
+    #else
+    private let authService: AuthServicing = AuthService()
     private let userRepository: UserRepository = FirebaseUserRepository()
     private let enrollmentRepository: EnrollmentRepository = FirebaseEnrollmentRepository()
+    #endif
 
     init() {
         if let uid = authService.getCurrentUser() {
@@ -30,7 +36,9 @@ class AuthViewModel: ObservableObject {
             Task {
                 await loadUserState(for: uid)
                 isInitializing = false
+                #if !UI_ONLY_BETA
                 BackgroundTaskManager.schedulePressureCollection()
+                #endif
                 SurveyScheduler.shared.scheduleDailyNotifications()
             }
         } else {
@@ -52,7 +60,9 @@ class AuthViewModel: ObservableObject {
 
             userInfo = try await userRepository.createUser(uid: uid, country: country, stateRegion: stateRegion)
 
+            #if !UI_ONLY_BETA
             BackgroundTaskManager.schedulePressureCollection()
+            #endif
             _ = await SurveyScheduler.shared.requestPermission()
             SurveyScheduler.shared.scheduleDailyNotifications()
         } catch {

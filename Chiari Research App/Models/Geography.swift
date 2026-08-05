@@ -3,7 +3,11 @@
 //  Chiari Research App
 //
 //  Coarse geography options collected at enrollment (and editable in Profile).
-//  Deliberately limited to country + state/region — no finer location.
+//  Deliberately limited to country + US Census region — no finer location.
+//  Exact state was intentionally dropped in favor of the 4-region grouping:
+//  combined with a rare diagnosis and other baseline fields, state-level detail
+//  is a meaningful re-identification risk that region-level detail avoids
+//  while still supporting regional analysis.
 //
 
 import Foundation
@@ -27,18 +31,9 @@ enum Geography {
         "Other"
     ]
 
-    /// US states/territories, shown when the selected country is the US.
-    static let usStates: [String] = [
-        "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado",
-        "Connecticut", "Delaware", "District of Columbia", "Florida", "Georgia",
-        "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa", "Kansas", "Kentucky",
-        "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
-        "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada",
-        "New Hampshire", "New Jersey", "New Mexico", "New York",
-        "North Carolina", "North Dakota", "Ohio", "Oklahoma", "Oregon",
-        "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
-        "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington",
-        "West Virginia", "Wisconsin", "Wyoming"
+    /// US Census regions, shown when the selected country is the US.
+    static let usRegions: [String] = [
+        "Northeast", "Midwest", "South", "West"
     ]
 
     static let unitedStates = "United States"

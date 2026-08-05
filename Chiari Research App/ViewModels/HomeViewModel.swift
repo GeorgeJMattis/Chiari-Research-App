@@ -15,8 +15,13 @@ class HomeViewModel: ObservableObject {
     @Published var completionByDay: [Date: Int] = [:]
     @Published var isLoading = false
 
-    private let surveyRepo = FirebaseSurveyRepository()
-    private let userRepo   = FirebaseUserRepository()
+    #if UI_ONLY_BETA
+    private let surveyRepo: SurveyRepository = MockSurveyRepository()
+    private let userRepo: UserRepository = MockUserRepository()
+    #else
+    private let surveyRepo: SurveyRepository = FirebaseSurveyRepository()
+    private let userRepo: UserRepository = FirebaseUserRepository()
+    #endif
 
     func load(uid: String, userInfo: UserInfo) async {
         isLoading = true

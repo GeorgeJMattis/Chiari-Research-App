@@ -19,7 +19,11 @@ class BaselineViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
+    #if UI_ONLY_BETA
+    private let repo: BaselineRepository = MockBaselineRepository()
+    #else
     private let repo: BaselineRepository = FirebaseBaselineRepository()
+    #endif
     private var hasLoaded = false
 
     var totalCount: Int { questionnaires.count }

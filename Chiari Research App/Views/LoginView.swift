@@ -30,19 +30,36 @@ struct WelcomeView: View {
             Spacer()
 
             VStack(spacing: 10) {
+                #if UI_ONLY_BETA
+                Text("MyChiariBeta")
+                    .font(.largeTitle)
+                    .bold()
+                Text("Interface Preview")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                #else
                 Text("Chiari Research")
                     .font(.largeTitle)
                     .bold()
                 Text("Beta")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
+                #endif
             }
 
-            Text("Join the study anonymously. We never collect your name or email — only your region, plus the sensor and symptom data you choose to share.")
+            #if UI_ONLY_BETA
+            Text("This is a preview of the app's interface. It's not a research study, and no data is collected, stored, or sent anywhere — everything you see is sample data on your device.")
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 24)
+            #else
+            Text("Join the study anonymously. We never collect your name or email — only your region, the baseline health questionnaire, and the sensor and symptom data you choose to share.")
+                .font(.callout)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 24)
+            #endif
 
             // Coarse geography, collected once at enrollment.
             VStack(spacing: 14) {
@@ -66,7 +83,11 @@ struct WelcomeView: View {
                     ProgressView()
                         .tint(.white)
                 } else {
+                    #if UI_ONLY_BETA
+                    Text("Continue")
+                    #else
                     Text("Join Study")
+                    #endif
                 }
             }
             .frame(maxWidth: .infinity)

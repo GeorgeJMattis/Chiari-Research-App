@@ -24,7 +24,11 @@ class SurveyViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var errorMessage: String?
 
-    private let surveyRepo = FirebaseSurveyRepository()
+    #if UI_ONLY_BETA
+    private let surveyRepo: SurveyRepository = MockSurveyRepository()
+    #else
+    private let surveyRepo: SurveyRepository = FirebaseSurveyRepository()
+    #endif
 
     func loadToday(uid: String) async {
         isLoading = true

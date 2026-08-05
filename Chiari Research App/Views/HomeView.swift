@@ -70,11 +70,17 @@ struct HomeView: View {
 
     private var studyHeader: some View {
         HStack(spacing: 0) {
+            #if UI_ONLY_BETA
+            StatCell(value: "\(homeViewModel.studyDay)", label: "Preview Day")
+            Divider().frame(height: 36)
+            StatCell(value: "\(homeViewModel.daysRemaining)", label: "Days Left")
+            #else
             StatCell(value: "\(homeViewModel.studyDay)", label: "Study Day")
             Divider().frame(height: 36)
             StatCell(value: "\(homeViewModel.daysRemaining)", label: "Days Left")
             Divider().frame(height: 36)
             StatCell(value: "\(homeViewModel.participantCount)", label: "Participants")
+            #endif
         }
         .frame(maxWidth: .infinity)
         .padding(12)
@@ -86,8 +92,13 @@ struct HomeView: View {
 
     private var calendarSection: some View {
         VStack(alignment: .leading, spacing: 10) {
+            #if UI_ONLY_BETA
+            Text("Sample Calendar")
+                .font(.headline)
+            #else
             Text("Study Calendar")
                 .font(.headline)
+            #endif
 
             let days = studyDays()
             let columns = Array(repeating: GridItem(.flexible(), spacing: 6), count: 7)

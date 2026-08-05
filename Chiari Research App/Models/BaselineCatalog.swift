@@ -5,7 +5,10 @@
 //  The baseline questionnaire content, transcribed from the anonymous-safe
 //  portions of the Chiari 1000 registry (Background & Medical History, Parts
 //  1–6). Identity fields (name/email/address, exact DOB, surgeon name) are
-//  deliberately omitted; ages are collected in years, surgery dates as MM/YYYY.
+//  deliberately omitted; ages are collected in decade bands rather than exact
+//  years, and surgery dates as year-only, to limit re-identification risk when
+//  combined with geography and a rare diagnosis. Parental race/ethnicity
+//  questions from the original registry were dropped for the same reason.
 //
 //  This is content-as-data: BaselineFormView renders any questionnaire here
 //  generically. Bump a questionnaire's `version` when its questions change.
@@ -38,6 +41,13 @@ enum BaselineCatalog {
         "Improved significantly", "Improved slightly", "No change",
         "Worsened slightly", "Worsened significantly"
     ]
+    /// Age is collected in decade bands rather than exact years — combined with
+    /// geography and a rare diagnosis, an exact age is a meaningful
+    /// re-identification risk. Bands are used for current age, age at
+    /// diagnosis, and age at symptom onset alike.
+    private static let ageBandOptions = [
+        "Under 18", "18-24", "25-34", "35-44", "45-54", "55-64", "65-74", "75-84", "85+"
+    ]
     private static func yes(_ id: String) -> ShowCondition { ShowCondition(questionID: id, equals: ["Yes"]) }
 
     // MARK: - 1. General Background
@@ -47,10 +57,10 @@ enum BaselineCatalog {
         title: "General Background",
         subtitle: "Demographics · about 5 min",
         systemImage: "person.text.rectangle",
-        version: 1,
+        version: 2, // v2: age banded, parental race/ethnicity questions removed
         questions: [
             BaselineQuestion(id: "gender", prompt: "Gender", type: .singleChoice(["Female", "Male"])),
-            BaselineQuestion(id: "age", prompt: "What is your age, in years?", type: .number(min: 0, max: 120, unit: "years")),
+            BaselineQuestion(id: "age", prompt: "What is your age?", type: .singleChoice(ageBandOptions)),
             BaselineQuestion(id: "heightInches", prompt: "Height", type: .number(min: 0, max: 96, unit: "in"), isOptional: true),
             BaselineQuestion(id: "weightPounds", prompt: "Weight", type: .number(min: 0, max: 1000, unit: "lb"), isOptional: true),
             BaselineQuestion(id: "race", prompt: "Race (check all that apply)", type: .multiChoice(raceOptions)),
@@ -75,13 +85,7 @@ enum BaselineCatalog {
                     "Out of work but not currently looking for work", "A homemaker", "A student",
                     "Military", "Retired", "Unable to work", "Too young for employment"
                 ])
-            ),
-            BaselineQuestion(id: "motherRaceKnown", prompt: "Is your biological mother's race known?", type: .boolean, isOptional: true),
-            BaselineQuestion(id: "motherRace", prompt: "Mother's race (check all that apply)", type: .multiChoice(raceOptions), isOptional: true, condition: yes("motherRaceKnown")),
-            BaselineQuestion(id: "motherEthnicity", prompt: "Mother's ethnicity", type: .singleChoice(ethnicityOptions), isOptional: true, condition: yes("motherRaceKnown")),
-            BaselineQuestion(id: "fatherRaceKnown", prompt: "Is your biological father's race known?", type: .boolean, isOptional: true),
-            BaselineQuestion(id: "fatherRace", prompt: "Father's race (check all that apply)", type: .multiChoice(raceOptions), isOptional: true, condition: yes("fatherRaceKnown")),
-            BaselineQuestion(id: "fatherEthnicity", prompt: "Father's ethnicity", type: .singleChoice(ethnicityOptions), isOptional: true, condition: yes("fatherRaceKnown"))
+            )
         ]
     )
 
@@ -92,13 +96,13 @@ enum BaselineCatalog {
         title: "Chiari Diagnosis",
         subtitle: "Diagnosis history · about 5 min",
         systemImage: "brain.head.profile",
-        version: 1,
+        version: 2, // v2: ageAtDiagnosis banded
         questions: [
             BaselineQuestion(id: "hadMRI", prompt: "Have you had an MRI which showed a Chiari malformation or herniation of the cerebellar tonsils?", type: .boolean),
             BaselineQuestion(id: "hasMRICopy", prompt: "Do you have a copy of your MRI (prior to any Chiari surgery) on a disc or hard drive?", type: .boolean, isOptional: true, condition: yes("hadMRI")),
             BaselineQuestion(id: "physicianDiagnosed", prompt: "Has a physician diagnosed you with Chiari malformation?", type: .boolean),
             BaselineQuestion(id: "chiariType", prompt: "Please indicate the type", type: .singleChoice(["Chiari I", "Chiari II", "Chiari III", "Chiari IV", "Unknown"]), condition: yes("physicianDiagnosed")),
-            BaselineQuestion(id: "ageAtDiagnosis", prompt: "What was your age, in years, when you were diagnosed?", type: .number(min: 0, max: 120, unit: "years"), condition: yes("physicianDiagnosed")),
+            BaselineQuestion(id: "ageAtDiagnosis", prompt: "What was your age when you were diagnosed?", type: .singleChoice(ageBandOptions), condition: yes("physicianDiagnosed")),
             BaselineQuestion(id: "diagnosisContext", prompt: "Were you actively seeking a diagnosis, or was it found incidentally?", type: .singleChoice(["Actively Seeking Diagnosis", "Found Incidentally"]), condition: yes("physicianDiagnosed")),
             BaselineQuestion(id: "monthsSearching", prompt: "Approximately how many months had you been searching for a diagnosis?", type: .number(min: 0, max: 600, unit: "months"), isOptional: true, condition: ShowCondition(questionID: "diagnosisContext", equals: ["Actively Seeking Diagnosis"])),
             BaselineQuestion(id: "doctorsSeen", prompt: "How many different doctors did you see searching for a diagnosis?", type: .number(min: 0, max: 100, unit: nil), isOptional: true, condition: ShowCondition(questionID: "diagnosisContext", equals: ["Actively Seeking Diagnosis"])),
@@ -170,9 +174,9 @@ enum BaselineCatalog {
         title: "Symptoms",
         subtitle: "Current symptoms · about 5 min",
         systemImage: "waveform.path.ecg",
-        version: 1,
+        version: 2, // v2: symptomOnsetAge banded
         questions: [
-            BaselineQuestion(id: "symptomOnsetAge", prompt: "At what age, in years, did symptoms you attribute to Chiari first appear?", type: .number(min: 0, max: 120, unit: "years")),
+            BaselineQuestion(id: "symptomOnsetAge", prompt: "At what age did symptoms you attribute to Chiari first appear?", type: .singleChoice(ageBandOptions)),
             BaselineQuestion(id: "onsetConfidence", prompt: "How confident are you that this is when Chiari-related symptoms started?", type: .singleChoice(["Not very confident", "Somewhat confident", "Very confident"])),
             BaselineQuestion(id: "specificTrigger", prompt: "Do you remember a specific event which triggered your Chiari symptoms?", type: .boolean),
             BaselineQuestion(id: "triggerEvent", prompt: "What was the event?", type: .singleChoice(["Sports Injury", "Car Accident", "Fall", "Childbirth", "Surgery", "Illness", "Other"]), isOptional: true, condition: yes("specificTrigger")),
@@ -222,13 +226,13 @@ enum BaselineCatalog {
         title: "Surgical History",
         subtitle: "Chiari-related surgeries · about 5 min",
         systemImage: "cross.case",
-        version: 1,
+        version: 2, // v2: recentDecompressionDate is year-only
         questions: [
             BaselineQuestion(id: "hadChiariSurgery", prompt: "Have you undergone any type of Chiari-related surgery?", type: .boolean),
             BaselineQuestion(id: "decompression", prompt: "Chiari decompression / Posterior Fossa Decompression", type: .boolean, condition: yes("hadChiariSurgery")),
             BaselineQuestion(id: "multipleDecompressions", prompt: "Have you undergone more than one Chiari decompression and/or revision?", type: .boolean, isOptional: true, condition: yes("decompression")),
             BaselineQuestion(id: "decompressionCount", prompt: "How many decompressions/revisions have you undergone?", type: .number(min: 0, max: 50, unit: nil), isOptional: true, condition: yes("multipleDecompressions")),
-            BaselineQuestion(id: "recentDecompressionDate", prompt: "Month and year of your MOST RECENT decompression/revision (MM/YYYY)", type: .text, isOptional: true, condition: yes("decompression")),
+            BaselineQuestion(id: "recentDecompressionDate", prompt: "Year of your most recent decompression/revision", type: .number(min: 1950, max: Double(Calendar.current.component(.year, from: Date())), unit: nil), isOptional: true, condition: yes("decompression")),
             BaselineQuestion(id: "shuntPlacement", prompt: "Shunt placement", type: .boolean, condition: yes("hadChiariSurgery")),
             BaselineQuestion(id: "cervicalFusion", prompt: "Cervical fusion / stabilization", type: .boolean, condition: yes("hadChiariSurgery")),
             BaselineQuestion(id: "transoralDecompression", prompt: "Transoral (through the mouth) decompression", type: .boolean, condition: yes("hadChiariSurgery")),

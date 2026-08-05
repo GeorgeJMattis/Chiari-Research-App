@@ -11,6 +11,7 @@ protocol UserRepository {
     func fetchUser(uid: String) async throws -> UserInfo
     func updateUser(_ user: UserInfo) async throws
     func createUser(uid: String, country: String?, stateRegion: String?) async throws -> UserInfo
+    func fetchParticipantCount() async throws -> Int
 }
 
 extension UserRepository {

@@ -2,9 +2,10 @@
 //  GeographyPicker.swift
 //  Chiari Research App
 //
-//  Reusable country + state/region input, shared by the enrollment flow
-//  (WelcomeView) and ProfileView. When the country is the US, the state field
-//  becomes a picker of US states; otherwise it is free text.
+//  Reusable country + region input, shared by the enrollment flow (WelcomeView)
+//  and ProfileView. When the country is the US, the region field becomes a
+//  picker of the 4 US Census regions (not individual states — see
+//  Geography.swift); otherwise it is free text.
 //
 
 import SwiftUI
@@ -37,15 +38,15 @@ struct GeographyPicker: View {
             }
         }
 
-        // State / region
+        // Region
         if country == Geography.unitedStates {
             Menu {
-                ForEach(Geography.usStates, id: \.self) { s in
-                    Button(s) { stateRegion = s }
+                ForEach(Geography.usRegions, id: \.self) { r in
+                    Button(r) { stateRegion = r }
                 }
             } label: {
                 HStack {
-                    Text("State")
+                    Text("Region")
                         .foregroundStyle(.primary)
                     Spacer()
                     Text(stateRegion.isEmpty ? "Select" : stateRegion)
@@ -57,7 +58,7 @@ struct GeographyPicker: View {
             }
         } else if !country.isEmpty {
             HStack {
-                Text("State / Region")
+                Text("Region")
                 Spacer()
                 TextField("Optional", text: $stateRegion)
                     .multilineTextAlignment(.trailing)

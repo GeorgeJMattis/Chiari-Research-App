@@ -8,7 +8,7 @@
 import FirebaseAuth
 import Foundation
 
-class AuthService {
+class AuthService: AuthServicing {
     /// Signs the participant in anonymously. Firebase issues a persistent UID
     /// with no email/password. Requires Anonymous auth to be enabled in the
     /// Firebase console (Authentication → Sign-in method → Anonymous).

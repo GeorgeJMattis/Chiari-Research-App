@@ -53,19 +53,32 @@ struct ProfileView: View {
                     .disabled(!canSave)
                 }
 
+                #if UI_ONLY_BETA
+                Section("Preview") {
+                    Text("This is a local preview session — no account or data is stored remotely.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                #else
                 Section("Participant") {
                     Text(authViewModel.currentUser ?? "Unknown")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
                 }
+                #endif
 
                 Section {
                     Button(role: .destructive) {
                         showLeaveConfirmation = true
                     } label: {
+                        #if UI_ONLY_BETA
+                        Text("Reset Preview")
+                            .frame(maxWidth: .infinity)
+                        #else
                         Text("Leave Study")
                             .frame(maxWidth: .infinity)
+                        #endif
                     }
                 }
             }
@@ -79,6 +92,16 @@ struct ProfileView: View {
             } message: {
                 Text("Your location has been updated.")
             }
+            #if UI_ONLY_BETA
+            .alert("Reset the preview?", isPresented: $showLeaveConfirmation) {
+                Button("Cancel", role: .cancel) {}
+                Button("Reset Preview", role: .destructive) {
+                    authViewModel.logout()
+                }
+            } message: {
+                Text("This clears your local preview session. Nothing was collected or stored remotely, so there's nothing to lose.")
+            }
+            #else
             .alert("Leave the study?", isPresented: $showLeaveConfirmation) {
                 Button("Cancel", role: .cancel) {}
                 Button("Leave Study", role: .destructive) {
@@ -89,6 +112,7 @@ struct ProfileView: View {
                 // permanently disconnects this device from its study data.
                 Text("Because your participation is anonymous, leaving the study permanently disconnects this device from your collected data. This cannot be undone.")
             }
+            #endif
         }
     }
 }
