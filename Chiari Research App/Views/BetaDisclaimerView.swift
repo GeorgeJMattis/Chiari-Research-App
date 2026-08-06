@@ -24,7 +24,7 @@ struct BetaDisclaimerView: View {
                 Text("Preview Build")
                     .font(.largeTitle)
                     .bold()
-                Text("This is a preview of MyChiariBeta's interface only. It is not a research study, and no data is collected, stored, or transmitted — everything you see uses sample data on this device. No IRB review has been conducted for this preview.")
+                Text("This is a preview of MyChiariBeta's interface only. It is not a research study, and no data is collected, stored, or transmitted. Everything you see uses sample data on this device. No IRB review has been conducted for this preview.")
                     .font(.callout)
                     .multilineTextAlignment(.center)
                     .foregroundStyle(.secondary)
@@ -34,7 +34,7 @@ struct BetaDisclaimerView: View {
             Spacer()
 
             Button(action: onContinue) {
-                Text("I Understand — Continue")
+                Text("I Understand and Continue")
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
                     .background(.blue)

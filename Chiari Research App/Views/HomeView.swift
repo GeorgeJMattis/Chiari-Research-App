@@ -49,7 +49,7 @@ struct HomeView: View {
                         Text("Baseline surveys")
                             .font(.subheadline).bold()
                             .foregroundStyle(.primary)
-                        Text("\(baselineViewModel.completedCount) of \(baselineViewModel.totalCount) completed — tap to continue")
+                        Text("\(baselineViewModel.completedCount) of \(baselineViewModel.totalCount) completed, tap to continue")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }

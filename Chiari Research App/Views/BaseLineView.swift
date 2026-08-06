@@ -59,7 +59,7 @@ struct BaselineView: View {
             ProgressView(value: Double(done), total: Double(max(total, 1)))
                 .tint(.blue)
             Text(baselineViewModel.allCompleted
-                 ? "All baseline questionnaires are complete — thank you!"
+                 ? "All baseline questionnaires are complete. Thank you!"
                  : "Complete your baseline questionnaires when you have a few minutes.")
                 .font(.caption)
                 .foregroundStyle(.secondary)

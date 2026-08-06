@@ -15,6 +15,7 @@ import SwiftUI
 struct WelcomeView: View {
     @ObservedObject var authViewModel: AuthViewModel
     @State private var showEnrollment = false
+    @State private var showConsentPreview = false
     @State private var country = ""
     @State private var stateRegion = ""
 
@@ -48,13 +49,13 @@ struct WelcomeView: View {
             }
 
             #if UI_ONLY_BETA
-            Text("This is a preview of the app's interface. It's not a research study, and no data is collected, stored, or sent anywhere — everything you see is sample data on your device.")
+            Text("This is a preview of the app's interface. It's not a research study, and no data is collected, stored, or sent anywhere. Everything you see is sample data on your device.")
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 24)
             #else
-            Text("Join the study anonymously. We never collect your name or email — only your region, the baseline health questionnaire, and the sensor and symptom data you choose to share.")
+            Text("Join the study anonymously. We never collect your name or email, only your region, the baseline health questionnaire, and the sensor and symptom data you choose to share.")
                 .font(.callout)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
@@ -109,6 +110,17 @@ struct WelcomeView: View {
             .ignoresSafeArea()
         }
         #endif
+        #if UI_ONLY_BETA
+        .sheet(isPresented: $showConsentPreview) {
+            ConsentPreviewView(
+                onContinue: {
+                    showConsentPreview = false
+                    Task { await authViewModel.signInAnonymously(country: country, stateRegion: stateRegion) }
+                },
+                onCancel: { showConsentPreview = false }
+            )
+        }
+        #endif
     }
 
     private func joinTapped() {
@@ -116,8 +128,12 @@ struct WelcomeView: View {
         // Present consent + baseline survey; enrollment completes in the
         // task's completion handler above.
         showEnrollment = true
+        #elseif UI_ONLY_BETA
+        // Preview build: show a placeholder of the consent forms the real study
+        // would present, then continue using sample data.
+        showConsentPreview = true
         #else
-        // No ResearchKit yet — enroll directly.
+        // No ResearchKit yet, so enroll directly.
         Task { await authViewModel.signInAnonymously(country: country, stateRegion: stateRegion) }
         #endif
     }

@@ -55,7 +55,7 @@ struct ProfileView: View {
 
                 #if UI_ONLY_BETA
                 Section("Preview") {
-                    Text("This is a local preview session — no account or data is stored remotely.")
+                    Text("This is a local preview session. No account or data is stored remotely.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

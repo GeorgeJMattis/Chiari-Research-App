@@ -13,23 +13,17 @@
 import Foundation
 
 enum Geography {
-    /// A short, ordered list of common study countries. "Other" lets
-    /// participants outside the list still enroll.
-    static let countries: [String] = [
-        "United States",
-        "Canada",
-        "United Kingdom",
-        "Ireland",
-        "Australia",
-        "New Zealand",
-        "Germany",
-        "France",
-        "Netherlands",
-        "Spain",
-        "Italy",
-        "India",
-        "Other"
-    ]
+    /// Every ISO country/territory, localized to English, with the United
+    /// States pinned first and "Other" last. "Other" lets participants outside
+    /// the list still enroll.
+    static let countries: [String] = {
+        let english = Locale(identifier: "en_US")
+        let names = Locale.Region.isoRegions
+            .filter { $0.subRegions.isEmpty && $0.identifier.count == 2 }
+            .compactMap { english.localizedString(forRegionCode: $0.identifier) }
+        let rest = Set(names).subtracting([unitedStates]).sorted()
+        return [unitedStates] + rest + ["Other"]
+    }()
 
     /// US Census regions, shown when the selected country is the US.
     static let usRegions: [String] = [

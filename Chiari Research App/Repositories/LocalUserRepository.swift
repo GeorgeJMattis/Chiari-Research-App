@@ -38,4 +38,9 @@ class LocalUserRepository: UserRepository {
         try await updateUser(userInfo)
         return userInfo
     }
+
+    func fetchParticipantCount() async throws -> Int {
+        // Local store only tracks this device's participant.
+        return 1
+    }
 }

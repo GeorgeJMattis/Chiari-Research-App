@@ -192,7 +192,7 @@ struct BaselineFormView: View {
             HStack {
                 Text(minLabel).font(.caption2).foregroundStyle(.secondary)
                 Spacer()
-                Text(currentInt.map(String.init) ?? "—").font(.headline)
+                Text(currentInt.map(String.init) ?? "-").font(.headline)
                 Spacer()
                 Text(maxLabel).font(.caption2).foregroundStyle(.secondary)
             }
