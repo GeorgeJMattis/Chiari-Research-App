@@ -13,12 +13,29 @@ struct SurveyDetailView: View {
 
     @State private var hadHeadache: Bool = false
     @State private var painLevel: Double = 5
+    @State private var hadBalanceProblem: Bool = false
+    @State private var balance: Double = 5
+    @State private var hadNumbness: Bool = false
+    @State private var numbnessTingling: Double = 5
+    @State private var cheerful: Double = 0
+    @State private var sad: Double = 0
+    @State private var anxious: Double = 0
     @State private var prefill: SurveyResponses? = nil
     @State private var isSubmitting = false
     @State private var errorMessage: String?
 
     private var currentResponses: SurveyResponses {
-        SurveyResponses(hadHeadache: hadHeadache, painLevel: painLevel)
+        SurveyResponses(
+            hadHeadache: hadHeadache,
+            painLevel: painLevel,
+            hadBalanceProblem: hadBalanceProblem,
+            balance: balance,
+            hadNumbness: hadNumbness,
+            numbnessTingling: numbnessTingling,
+            cheerful: cheerful,
+            sad: sad,
+            anxious: anxious
+        )
     }
 
     private var hasChangedFromPrefill: Bool {
@@ -84,12 +101,55 @@ struct SurveyDetailView: View {
                     .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
+                // Question 3: Balance problems (Yes/No, then severity)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Did you have balance problems today?")
+                        .font(.headline)
+                    HStack(spacing: 12) {
+                        ChoiceButton(label: "Yes", isSelected: hadBalanceProblem) {
+                            hadBalanceProblem = true
+                        }
+                        ChoiceButton(label: "No", isSelected: !hadBalanceProblem) {
+                            hadBalanceProblem = false
+                        }
+                    }
+                }
+                if hadBalanceProblem {
+                    SliderQuestionCard(title: "Balance severity", value: $balance, range: 1...10, lowLabel: "Mild", highLabel: "Severe")
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                // Question 4: Numbness or tingling (Yes/No, then severity)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Did you have numbness or tingling today?")
+                        .font(.headline)
+                    HStack(spacing: 12) {
+                        ChoiceButton(label: "Yes", isSelected: hadNumbness) {
+                            hadNumbness = true
+                        }
+                        ChoiceButton(label: "No", isSelected: !hadNumbness) {
+                            hadNumbness = false
+                        }
+                    }
+                }
+                if hadNumbness {
+                    SliderQuestionCard(title: "Numbness or tingling severity", value: $numbnessTingling, range: 1...10, lowLabel: "Mild", highLabel: "Severe")
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                }
+
+                // Mood check-ins (always shown), each 0–10
+                SliderQuestionCard(title: "How cheerful do you feel?", value: $cheerful, lowLabel: "Not at all", highLabel: "Very")
+                SliderQuestionCard(title: "How sad do you feel?", value: $sad, lowLabel: "Not at all", highLabel: "Very")
+                SliderQuestionCard(title: "How anxious do you feel?", value: $anxious, lowLabel: "Not at all", highLabel: "Very")
+
                 if let err = errorMessage {
                     Text(err).font(.caption).foregroundStyle(.red)
                 }
             }
             .padding(16)
             .animation(.easeInOut(duration: 0.2), value: hadHeadache)
+            .animation(.easeInOut(duration: 0.2), value: hadBalanceProblem)
+            .animation(.easeInOut(duration: 0.2), value: hadNumbness)
         }
         .navigationTitle("Check-in")
         .navigationBarTitleDisplayMode(.inline)
@@ -117,8 +177,15 @@ struct SurveyDetailView: View {
     private func loadPrefill() async {
         prefill = await surveyViewModel.fetchPrefill(uid: uid, slot: slot.slot)
         if let p = prefill {
-            hadHeadache = p.hadHeadache
-            painLevel   = p.painLevel
+            hadHeadache       = p.hadHeadache
+            painLevel         = p.painLevel
+            hadBalanceProblem = p.hadBalanceProblem
+            balance           = p.balance
+            hadNumbness       = p.hadNumbness
+            numbnessTingling  = p.numbnessTingling
+            cheerful          = p.cheerful
+            sad               = p.sad
+            anxious           = p.anxious
         }
     }
 
@@ -152,6 +219,37 @@ private struct ChoiceButton: View {
                 .foregroundStyle(isSelected ? .white : .primary)
                 .clipShape(.rect(cornerRadius: 8))
         }
+    }
+}
+
+/// A 0–10 slider question card, styled like the headache pain slider.
+private struct SliderQuestionCard: View {
+    let title: String
+    @Binding var value: Double
+    var range: ClosedRange<Double> = 0...10
+    let lowLabel: String
+    let highLabel: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text(title).font(.headline)
+                Spacer()
+                Text(String(format: "%.0f / 10", value))
+                    .font(.headline)
+                    .foregroundStyle(.blue)
+            }
+            Slider(value: $value, in: range, step: 1)
+                .tint(.blue)
+            HStack {
+                Text(lowLabel).font(.caption).foregroundStyle(.secondary)
+                Spacer()
+                Text(highLabel).font(.caption).foregroundStyle(.secondary)
+            }
+        }
+        .padding(16)
+        .background(.gray.opacity(0.08))
+        .clipShape(.rect(cornerRadius: 12))
     }
 }
 

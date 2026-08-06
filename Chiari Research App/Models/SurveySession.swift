@@ -33,6 +33,14 @@ enum SurveySlot: String, Codable, CaseIterable {
 struct SurveyResponses: Codable, Equatable {
     var hadHeadache: Bool
     var painLevel: Double  // 1–10, only meaningful when hadHeadache == true
+    var hadBalanceProblem: Bool = false
+    var balance: Double = 0            // 1–10, only meaningful when hadBalanceProblem
+    var hadNumbness: Bool = false
+    var numbnessTingling: Double = 0   // 1–10, only meaningful when hadNumbness
+    // Mood check-ins, each 0–10 (0 = not at all, 10 = very).
+    var cheerful: Double = 0
+    var sad: Double = 0
+    var anxious: Double = 0
 }
 
 struct SurveySession: Codable, Identifiable {

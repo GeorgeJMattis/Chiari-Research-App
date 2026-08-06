@@ -52,6 +52,11 @@ enum MockDataGenerator {
         for offset in 0...dayCount where offset % 2 == 0 {
             guard let day = cal.date(byAdding: .day, value: offset, to: cal.startOfDay(for: from)) else { continue }
             let pain = min(10.0, max(1.0, 5.0 + sin(Double(offset) / 3.0) * 3.0))
+            let balance = min(10.0, max(1.0, 3.0 + sin(Double(offset) / 2.0) * 2.0))
+            let numbness = min(10.0, max(1.0, 2.0 + cos(Double(offset) / 2.5) * 2.0))
+            let cheerful = min(10.0, max(0.0, 6.0 + sin(Double(offset) / 4.0) * 3.0))
+            let sad = min(10.0, max(0.0, 3.0 + cos(Double(offset) / 3.0) * 2.5))
+            let anxious = min(10.0, max(0.0, 4.0 + sin(Double(offset) / 2.0 + 1.0) * 2.5))
             let scheduled = cal.date(bySettingHour: 20, minute: 0, second: 0, of: day) ?? day
             sessions.append(
                 SurveySession(
@@ -59,7 +64,17 @@ enum MockDataGenerator {
                     userId: uid,
                     scheduledDate: scheduled,
                     slot: .evening,
-                    responses: SurveyResponses(hadHeadache: true, painLevel: pain.rounded()),
+                    responses: SurveyResponses(
+                        hadHeadache: true,
+                        painLevel: pain.rounded(),
+                        hadBalanceProblem: offset % 4 != 0,
+                        balance: balance.rounded(),
+                        hadNumbness: offset % 6 != 0,
+                        numbnessTingling: numbness.rounded(),
+                        cheerful: cheerful.rounded(),
+                        sad: sad.rounded(),
+                        anxious: anxious.rounded()
+                    ),
                     isCompleted: true,
                     completedAt: scheduled
                 )

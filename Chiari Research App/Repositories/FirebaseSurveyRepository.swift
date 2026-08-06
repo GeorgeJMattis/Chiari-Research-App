@@ -16,7 +16,14 @@ class FirebaseSurveyRepository: SurveyRepository {
         if let r = session.responses {
             data["responses"] = [
                 "hadHeadache": r.hadHeadache,
-                "painLevel": r.painLevel
+                "painLevel": r.painLevel,
+                "hadBalanceProblem": r.hadBalanceProblem,
+                "balance": r.balance,
+                "hadNumbness": r.hadNumbness,
+                "numbnessTingling": r.numbnessTingling,
+                "cheerful": r.cheerful,
+                "sad": r.sad,
+                "anxious": r.anxious
             ]
         }
         if let completedAt = session.completedAt {
@@ -57,7 +64,17 @@ class FirebaseSurveyRepository: SurveyRepository {
         if let r = data["responses"] as? [String: Any],
            let hadHeadache = r["hadHeadache"] as? Bool,
            let painLevel = r["painLevel"] as? Double {
-            responses = SurveyResponses(hadHeadache: hadHeadache, painLevel: painLevel)
+            responses = SurveyResponses(
+                hadHeadache: hadHeadache,
+                painLevel: painLevel,
+                hadBalanceProblem: r["hadBalanceProblem"] as? Bool ?? false,
+                balance: r["balance"] as? Double ?? 0,
+                hadNumbness: r["hadNumbness"] as? Bool ?? false,
+                numbnessTingling: r["numbnessTingling"] as? Double ?? 0,
+                cheerful: r["cheerful"] as? Double ?? 0,
+                sad: r["sad"] as? Double ?? 0,
+                anxious: r["anxious"] as? Double ?? 0
+            )
         }
         let completedAt = (data["completedAt"] as? Timestamp)?.dateValue()
 
